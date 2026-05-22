@@ -3,199 +3,597 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Konfigurator Skolske Torbe</title>
-<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Fredoka+One&display=swap" rel="stylesheet">
+<title>Beckmann Konfigurator – Mamino.hr</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#FFF8F0;--primary:#FF6B35;--pl:#FF8C5A;--sec:#2EC4B6;--dark:#1A1A2E;--text:#3D3D3D;--card:#FFF;--border:#F0E8DF;--sh:0 8px 32px rgba(255,107,53,.12);--r:20px}
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
-header{background:var(--card);border-bottom:3px solid var(--border);padding:18px 40px;display:flex;align-items:center;gap:14px;box-shadow:0 2px 16px rgba(0,0,0,.06)}
-.logo{width:48px;height:48px;background:var(--primary);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:26px}
-header h1{font-family:'Fredoka One',cursive;font-size:1.8rem;color:var(--dark)}
-header span{color:var(--primary)}
-.sub{font-size:.85rem;color:#999;font-weight:600;letter-spacing:.5px;text-transform:uppercase}
-.main{max-width:1100px;margin:40px auto;padding:0 20px;display:grid;grid-template-columns:420px 1fr;gap:28px;align-items:start}
-.panel{background:var(--card);border-radius:var(--r);padding:30px;box-shadow:var(--sh);border:2px solid var(--border)}
-.ptitle{font-family:'Fredoka One',cursive;font-size:1.25rem;color:var(--dark);margin-bottom:22px}
-.field{margin-bottom:20px}
-label{display:block;font-weight:800;font-size:.82rem;text-transform:uppercase;letter-spacing:.8px;color:#888;margin-bottom:8px}
-.gg{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.gb{padding:12px;border:2.5px solid var(--border);border-radius:14px;background:#fff;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:800;font-size:.95rem;color:var(--text);transition:all .2s;display:flex;align-items:center;justify-content:center;gap:6px}
-.gb:hover{border-color:var(--primary);color:var(--primary)}
-.gb.active{border-color:var(--primary);background:var(--primary);color:#fff}
-input[type=range]{-webkit-appearance:none;width:100%;height:8px;border-radius:8px;background:linear-gradient(to right,var(--primary) 0%,var(--primary) var(--pct,50%),var(--border) var(--pct,50%));outline:none;cursor:pointer}
-input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;height:26px;border-radius:50%;background:var(--primary);border:3px solid #fff;box-shadow:0 2px 10px rgba(255,107,53,.4);cursor:pointer}
-.rv{display:inline-block;background:var(--primary);color:#fff;font-weight:800;font-size:1rem;padding:4px 12px;border-radius:20px;margin-top:8px}
-.bg2{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-.bc{border:2.5px solid var(--border);border-radius:14px;padding:12px 8px;cursor:pointer;text-align:center;transition:all .2s;background:#fff}
-.bc:hover{border-color:var(--sec);transform:translateY(-2px)}
-.bc.active{border-color:var(--sec);background:rgba(46,196,182,.06)}
-.be{font-size:2rem;display:block;margin-bottom:4px}
-.bn{font-size:.72rem;font-weight:800;color:#888;text-transform:uppercase;letter-spacing:.5px}
-.bp{font-size:.85rem;font-weight:900;color:var(--primary);margin-top:2px}
-.genbtn{width:100%;padding:16px;background:linear-gradient(135deg,var(--primary),var(--pl));color:#fff;border:none;border-radius:16px;font-family:'Fredoka One',cursive;font-size:1.2rem;cursor:pointer;margin-top:10px;box-shadow:0 6px 20px rgba(255,107,53,.35);transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px}
-.genbtn:hover{transform:translateY(-2px)}
-.genbtn:disabled{opacity:.65;cursor:not-allowed;transform:none}
-.pp{background:var(--card);border-radius:var(--r);box-shadow:var(--sh);border:2px solid var(--border);min-height:600px;display:flex;flex-direction:column;overflow:hidden}
-.ph{padding:22px 28px 18px;border-bottom:2px solid var(--border);display:flex;align-items:center;justify-content:space-between}
-.ph h2{font-family:'Fredoka One',cursive;font-size:1.3rem;color:var(--dark)}
-.badge{background:rgba(46,196,182,.12);color:var(--sec);font-weight:800;font-size:.75rem;padding:4px 12px;border-radius:20px;text-transform:uppercase}
-.pb{flex:1;display:flex;align-items:center;justify-content:center;padding:30px;position:relative;flex-direction:column;gap:20px}
-.es{text-align:center;color:#ccc}
-.es .bi{font-size:5rem;display:block;margin-bottom:16px;opacity:.4}
-.es p{font-weight:700;font-size:1rem;color:#bbb}
-#genimg{display:none;width:100%;max-width:420px;border-radius:20px;box-shadow:0 16px 48px rgba(0,0,0,.15)}
-.istrip{background:linear-gradient(135deg,#f8f4ff,#fff0f8);border:2px solid #ede0ff;border-radius:16px;padding:16px 22px;width:100%;max-width:420px;display:none}
-.istrip h3{font-family:'Fredoka One',cursive;color:var(--dark);font-size:1rem;margin-bottom:6px}
-.istrip p{font-size:.88rem;color:#777;line-height:1.5}
-.fs{display:flex;align-items:center;gap:8px;margin-top:10px}
-.fd{width:12px;height:12px;border-radius:50%}
-.fl{font-weight:800;font-size:.85rem}
-.lo{position:absolute;inset:0;background:rgba(255,255,255,.93);display:none;align-items:center;justify-content:center;flex-direction:column;gap:14px;border-radius:var(--r);z-index:10}
-.sp{width:56px;height:56px;border:5px solid var(--border);border-top-color:var(--primary);border-radius:50%;animation:spin .9s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
-.lt{font-family:'Fredoka One',cursive;font-size:1.1rem;color:var(--primary)}
-.ls{font-size:.82rem;color:#aaa;font-weight:600;text-align:center;max-width:260px}
-.err{background:#fff0f0;border:2px solid #ffcccc;border-radius:12px;padding:14px 18px;color:#cc3333;font-weight:700;font-size:.9rem;display:none;margin-top:12px}
-.cost{background:#f0fff4;border:2px solid #b2e8c4;border-radius:12px;padding:10px 14px;margin-top:10px;font-size:.8rem;color:#2a7a3a;font-weight:700;text-align:center}
-@media(max-width:800px){.main{grid-template-columns:1fr}}
+:root {
+  --brown: #9C7B6B;
+  --brown-light: #C4A898;
+  --brown-dark: #7A5C4E;
+  --navy: #1E2D5A;
+  --lavender: #C4A8D4;
+  --lavender-light: #EDE0F5;
+  --cream: #FAF7F4;
+  --white: #FFFFFF;
+  --border: #E8DDD6;
+  --text: #2D2D2D;
+  --text-light: #7A7A7A;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Jost', sans-serif;
+  background: var(--cream);
+  color: var(--text);
+  min-height: 100vh;
+}
+
+/* HEADER */
+header {
+  background: var(--white);
+  border-bottom: 1px solid var(--border);
+  padding: 0 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 72px;
+}
+.logo {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.9rem;
+  font-style: italic;
+  color: var(--navy);
+  letter-spacing: 1px;
+  font-weight: 400;
+}
+.header-sub {
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: var(--brown);
+}
+.beckmann-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--text-light);
+  border: 1px solid var(--border);
+  padding: 6px 14px;
+  border-radius: 2px;
+}
+
+/* HERO BANNER */
+.hero {
+  background: linear-gradient(135deg, var(--navy) 0%, #2E4080 100%);
+  color: white;
+  text-align: center;
+  padding: 48px 20px;
+}
+.hero-eyebrow {
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--lavender);
+  margin-bottom: 12px;
+}
+.hero h1 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 2.8rem;
+  font-weight: 600;
+  line-height: 1.2;
+  margin-bottom: 12px;
+}
+.hero h1 em {
+  font-style: italic;
+  color: var(--lavender);
+}
+.hero p {
+  font-size: 0.95rem;
+  font-weight: 300;
+  color: rgba(255,255,255,0.75);
+  max-width: 520px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+/* MAIN LAYOUT */
+.main {
+  max-width: 1140px;
+  margin: 48px auto;
+  padding: 0 24px;
+  display: grid;
+  grid-template-columns: 400px 1fr;
+  gap: 32px;
+  align-items: start;
+}
+
+/* PANEL */
+.panel {
+  background: var(--white);
+  border: 1px solid var(--border);
+  padding: 36px;
+}
+.panel-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: var(--navy);
+  margin-bottom: 28px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.panel-title span { color: var(--brown); }
+
+.field { margin-bottom: 24px; }
+.field-label {
+  display: block;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--text-light);
+  margin-bottom: 10px;
+}
+
+/* GENDER */
+.gender-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.gb {
+  padding: 11px;
+  border: 1.5px solid var(--border);
+  background: var(--white);
+  cursor: pointer;
+  font-family: 'Jost', sans-serif;
+  font-weight: 500;
+  font-size: 0.88rem;
+  color: var(--text);
+  transition: all 0.2s;
+  letter-spacing: 0.5px;
+}
+.gb:hover { border-color: var(--brown); color: var(--brown); }
+.gb.active { border-color: var(--brown); background: var(--brown); color: var(--white); }
+
+/* SLIDER */
+input[type=range] {
+  -webkit-appearance: none;
+  width: 100%; height: 2px;
+  background: linear-gradient(to right, var(--brown) 0%, var(--brown) var(--pct,50%), var(--border) var(--pct,50%));
+  outline: none; cursor: pointer;
+}
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  background: var(--white);
+  border: 2px solid var(--brown);
+  box-shadow: 0 2px 8px rgba(156,123,107,0.3);
+  cursor: pointer; transition: transform 0.15s;
+}
+input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.15); }
+.rv {
+  display: inline-block;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--brown);
+  margin-top: 8px;
+  letter-spacing: 0.5px;
+}
+
+/* BAG CARDS */
+.bag-grid { display: grid; grid-template-columns: 1fr; gap: 10px; }
+.bc {
+  border: 1.5px solid var(--border);
+  padding: 14px 16px;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: var(--white);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.bc:hover { border-color: var(--brown); }
+.bc.active { border-color: var(--brown); background: #FAF4F0; }
+.bc-icon {
+  width: 48px; height: 48px;
+  background: var(--cream);
+  border-radius: 2px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.6rem;
+  flex-shrink: 0;
+}
+.bc-info { flex: 1; }
+.bc-name {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--navy);
+  letter-spacing: 0.3px;
+}
+.bc-desc {
+  font-size: 0.72rem;
+  color: var(--text-light);
+  margin-top: 2px;
+  line-height: 1.4;
+}
+.bc-tag {
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--brown);
+  background: var(--lavender-light);
+  padding: 2px 8px;
+  border-radius: 1px;
+  white-space: nowrap;
+}
+
+/* BUTTON */
+.gen-btn {
+  width: 100%;
+  padding: 15px;
+  background: var(--navy);
+  color: var(--white);
+  border: none;
+  cursor: pointer;
+  font-family: 'Jost', sans-serif;
+  font-weight: 500;
+  font-size: 0.85rem;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  margin-top: 8px;
+  transition: all 0.2s;
+}
+.gen-btn:hover { background: var(--brown-dark); }
+.gen-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.cost-note {
+  text-align: center;
+  font-size: 0.7rem;
+  color: var(--text-light);
+  margin-top: 10px;
+  letter-spacing: 0.5px;
+}
+.err {
+  background: #FFF0F0;
+  border: 1px solid #FFCCCC;
+  padding: 12px 16px;
+  color: #CC3333;
+  font-size: 0.82rem;
+  display: none;
+  margin-top: 12px;
+}
+
+/* PREVIEW */
+.preview-panel {
+  background: var(--white);
+  border: 1px solid var(--border);
+  min-height: 620px;
+  display: flex;
+  flex-direction: column;
+}
+.preview-header {
+  padding: 20px 28px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.preview-header h2 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--navy);
+}
+.ai-badge {
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--brown);
+  border: 1px solid var(--brown-light);
+  padding: 4px 10px;
+}
+.preview-body {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px;
+  position: relative;
+  flex-direction: column;
+  gap: 24px;
+}
+.empty-state { text-align: center; }
+.empty-icon { font-size: 4rem; opacity: 0.15; display: block; margin-bottom: 16px; }
+.empty-state p { font-size: 0.88rem; color: var(--text-light); line-height: 1.6; }
+.empty-state strong { color: var(--navy); }
+
+#genimg {
+  display: none;
+  width: 100%; max-width: 420px;
+  box-shadow: 0 12px 48px rgba(30,45,90,0.12);
+}
+.fit-card {
+  background: var(--cream);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--brown);
+  padding: 16px 20px;
+  width: 100%; max-width: 420px;
+  display: none;
+}
+.fit-card h3 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--navy);
+  margin-bottom: 6px;
+}
+.fit-card p { font-size: 0.82rem; color: var(--text-light); line-height: 1.5; }
+.fit-score { display: flex; align-items: center; gap: 8px; margin-top: 10px; }
+.fit-dot { width: 8px; height: 8px; border-radius: 50%; }
+.fit-label { font-size: 0.78rem; font-weight: 600; letter-spacing: 0.5px; }
+
+/* LOADER */
+.lo {
+  position: absolute; inset: 0;
+  background: rgba(255,255,255,0.95);
+  display: none; align-items: center; justify-content: center;
+  flex-direction: column; gap: 16px; z-index: 10;
+}
+.sp {
+  width: 40px; height: 40px;
+  border: 2px solid var(--border);
+  border-top-color: var(--brown);
+  border-radius: 50%;
+  animation: spin 0.9s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.lt {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.1rem;
+  font-style: italic;
+  color: var(--navy);
+}
+.ls { font-size: 0.75rem; color: var(--text-light); letter-spacing: 0.5px; }
+
+/* FOOTER */
+footer {
+  text-align: center;
+  padding: 32px 20px;
+  font-size: 0.72rem;
+  color: var(--text-light);
+  border-top: 1px solid var(--border);
+  letter-spacing: 0.5px;
+  margin-top: 40px;
+}
+footer a { color: var(--brown); text-decoration: none; }
+
+@media(max-width:860px){
+  .main{grid-template-columns:1fr;}
+  header{padding:0 20px;}
+  .hero h1{font-size:2rem;}
+}
 </style>
 </head>
 <body>
+
 <header>
-  <div class="logo">🎒</div>
   <div>
-    <h1>Skolske <span>Torbe</span> Konfigurator</h1>
-    <div class="sub">Vidi kako torba stoji na tvom djetetu &bull; DALL-E 3</div>
+    <div class="logo">mamino</div>
+    <div class="header-sub">Beckmann Konfigurator</div>
+  </div>
+  <div class="beckmann-badge">
+    🎒 Beckmann Norway 1946
   </div>
 </header>
+
+<div class="hero">
+  <div class="hero-eyebrow">Interaktivni alat</div>
+  <h1>Pronađi savršenu torbu<br>za <em>vaše dijete</em></h1>
+  <p>Unesite podatke o djetetu i naš AI konfigurator generirat će realan prikaz kako torba izgleda na vašem školaru.</p>
+</div>
+
 <div class="main">
   <div class="panel">
-    <div class="ptitle">⚙️ Podaci o djetetu</div>
+    <div class="panel-title"><span>01</span> Podaci o djetetu</div>
+
     <div class="field">
-      <label>Spol djeteta</label>
-      <div class="gg">
-        <button class="gb active" data-g="boy" onclick="selG(this)">👦 Djecak</button>
-        <button class="gb" data-g="girl" onclick="selG(this)">👧 Djevojcica</button>
+      <span class="field-label">Spol djeteta</span>
+      <div class="gender-row">
+        <button class="gb active" data-g="boy" onclick="selG(this)">👦 Dječak</button>
+        <button class="gb" data-g="girl" onclick="selG(this)">👧 Djevojčica</button>
       </div>
     </div>
+
     <div class="field">
-      <label>Dob djeteta</label>
-      <input type="range" id="age" min="5" max="15" value="8" oninput="upd(this,'av','god')">
-      <span class="rv" id="av">8 god.</span>
+      <span class="field-label">Dob djeteta</span>
+      <input type="range" id="age" min="5" max="15" value="7" oninput="upd(this,'av','god')">
+      <span class="rv" id="av">7 god.</span>
     </div>
+
     <div class="field">
-      <label>Visina (cm)</label>
-      <input type="range" id="height" min="100" max="180" value="130" oninput="upd(this,'hv','cm')">
-      <span class="rv" id="hv">130 cm</span>
+      <span class="field-label">Visina djeteta</span>
+      <input type="range" id="height" min="100" max="180" value="125" oninput="upd(this,'hv','cm')">
+      <span class="rv" id="hv">125 cm</span>
     </div>
+
     <div class="field">
-      <label>Kilaza (kg)</label>
-      <input type="range" id="weight" min="18" max="80" value="30" oninput="upd(this,'wv','kg')">
-      <span class="rv" id="wv">30 kg</span>
+      <span class="field-label">Težina djeteta</span>
+      <input type="range" id="weight" min="18" max="80" value="25" oninput="upd(this,'wv','kg')">
+      <span class="rv" id="wv">25 kg</span>
     </div>
+
     <div class="field">
-      <label>Odaberi torbu</label>
-      <div class="bg2">
-        <div class="bc active" data-bag="classic school backpack, red" data-baghr="Klasicni ruksak" data-vol="20L" onclick="selB(this)">
-          <span class="be">🎒</span><div class="bn">Klasicni</div><div class="bp">189 kn</div>
+      <span class="field-label">Odaberi Beckmann model</span>
+      <div class="bag-grid">
+        <div class="bc active"
+          data-bag="Beckmann Plus Air school backpack, pink with white dots pattern"
+          data-baghr="Beckmann Plus Air"
+          data-vol="20L"
+          data-height="116-140"
+          data-grade="1. razred"
+          onclick="selB(this)">
+          <div class="bc-icon">🎒</div>
+          <div class="bc-info">
+            <div class="bc-name">Plus Air</div>
+            <div class="bc-desc">20L · H40.5×W28×D23cm · 1.25kg<br>Preporučena visina: 116–140 cm</div>
+          </div>
+          <div class="bc-tag">1. razred</div>
         </div>
-        <div class="bc" data-bag="sporty school backpack, blue with side pockets" data-baghr="Sportski ruksak" data-vol="25L" onclick="selB(this)">
-          <span class="be">🏃</span><div class="bn">Sportski</div><div class="bp">229 kn</div>
+        <div class="bc"
+          data-bag="Beckmann Active Air FLX school backpack, blue geometric pattern with air cushion back"
+          data-baghr="Beckmann Active Air FLX"
+          data-vol="25L"
+          data-height="116-140"
+          data-grade="1. razred"
+          onclick="selB(this)">
+          <div class="bc-icon">🏆</div>
+          <div class="bc-info">
+            <div class="bc-name">Active Air FLX</div>
+            <div class="bc-desc">20–25L · H39×W26×D22cm · 1kg<br>Preporučena visina: 116–140 cm</div>
+          </div>
+          <div class="bc-tag">Nagrađivano</div>
         </div>
-        <div class="bc" data-bag="ergonomic school backpack with padded back, green" data-baghr="Anatomski ruksak" data-vol="22L" onclick="selB(this)">
-          <span class="be">🧸</span><div class="bn">Anatomski</div><div class="bp">299 kn</div>
-        </div>
-        <div class="bc" data-bag="small mini school backpack, purple" data-baghr="Mini ruksak" data-vol="12L" onclick="selB(this)">
-          <span class="be">👜</span><div class="bn">Mini</div><div class="bp">159 kn</div>
-        </div>
-        <div class="bc" data-bag="large jumbo school backpack, navy blue" data-baghr="Jumbo ruksak" data-vol="35L" onclick="selB(this)">
-          <span class="be">🪨</span><div class="bn">Jumbo</div><div class="bp">349 kn</div>
-        </div>
-        <div class="bc" data-bag="school trolley bag with wheels and handle, orange" data-baghr="Torba na kotacima" data-vol="30L" onclick="selB(this)">
-          <span class="be">🧳</span><div class="bn">Kotacici</div><div class="bp">399 kn</div>
+        <div class="bc"
+          data-bag="Beckmann Classic school backpack, pastel purple and blue seashell pattern"
+          data-baghr="Beckmann Classic"
+          data-vol="22L"
+          data-height="116-140"
+          data-grade="1. razred"
+          onclick="selB(this)">
+          <div class="bc-icon">⭐</div>
+          <div class="bc-info">
+            <div class="bc-name">Classic</div>
+            <div class="bc-desc">22L · H37×W24×D25cm · 0.94kg<br>Preporučena visina: 116–140 cm</div>
+          </div>
+          <div class="bc-tag">Bestseller</div>
         </div>
       </div>
     </div>
-    <button class="genbtn" id="genBtn" onclick="gen()">✨ Generiraj realnu sliku</button>
-    <div class="cost">💡 ~0,04 € po generiranju (DALL-E 3 standard 1024x1024)</div>
+
+    <button class="gen-btn" id="genBtn" onclick="gen()">Generiraj prikaz →</button>
+    <div class="cost-note">~0,04 € po generiranju · DALL-E 3 · Slike su AI generirane ilustracije</div>
     <div class="err" id="err"></div>
   </div>
-  <div class="pp">
-    <div class="ph">
-      <h2>📸 Realni prikaz</h2>
-      <div class="badge">DALL-E 3</div>
+
+  <div class="preview-panel">
+    <div class="preview-header">
+      <h2>Realni prikaz djeteta s torbom</h2>
+      <div class="ai-badge">AI · DALL-E 3</div>
     </div>
-    <div class="pb">
+    <div class="preview-body">
       <div class="lo" id="lo">
         <div class="sp"></div>
-        <div class="lt">Generiram fotografiju... 📸</div>
-        <div class="ls">DALL-E 3 treba oko 15 sekundi</div>
+        <div class="lt">Generiram prikaz...</div>
+        <div class="ls">DALL-E 3 · 10–20 sekundi</div>
       </div>
-      <div class="es" id="es">
-        <span class="bi">📸</span>
-        <p>Ispuni podatke i klikni<br><strong>"Generiraj realnu sliku"</strong></p>
+      <div class="empty-state" id="es">
+        <span class="empty-icon">📸</span>
+        <p>Unesite podatke o djetetu<br>i odaberite Beckmann model,<br>zatim kliknite <strong>Generiraj prikaz</strong></p>
       </div>
-      <img id="genimg" alt="Dijete s torbom">
-      <div class="istrip" id="istrip"></div>
+      <img id="genimg" alt="Dijete s Beckmann torbom">
+      <div class="fit-card" id="fitcard"></div>
     </div>
   </div>
 </div>
+
+<footer>
+  © mamino.hr · Svi Beckmann proizvodi dostupni na <a href="https://mamino.hr" target="_blank">mamino.hr</a> ·
+  Slike su generirane AI ilustracije u svrhu prikaza proporcija.
+</footer>
+
 <script>
-let gender="boy";
-let bag={en:"classic school backpack, red",hr:"Klasicni ruksak",vol:"20L"};
-function selG(btn){document.querySelectorAll(".gb").forEach(b=>b.classList.remove("active"));btn.classList.add("active");gender=btn.dataset.g;}
-function selB(c){document.querySelectorAll(".bc").forEach(x=>x.classList.remove("active"));c.classList.add("active");bag={en:c.dataset.bag,hr:c.dataset.baghr,vol:c.dataset.vol};}
-function upd(el,vid,u){const s=u==="god"?" god.":" "+u;document.getElementById(vid).textContent=el.value+s;const p=((+el.value-+el.min)/(+el.max-+el.min)*100).toFixed(1);el.style.setProperty("--pct",p+"%");}
-["age","height","weight"].forEach(id=>{const el=document.getElementById(id);const p=((+el.value-+el.min)/(+el.max-+el.min)*100).toFixed(1);el.style.setProperty("--pct",p+"%");});
-function buildPrompt(g,age,h,w){
-  const gd=g==="boy"?`a ${age} year old boy with short hair, wearing t-shirt and pants`:`a ${age} year old girl with longer hair, wearing t-shirt and skirt`;
-  const bmi=w/((h/100)**2);
-  const build=bmi<16?"slim build":bmi<20?"average healthy build":bmi<24?"slightly stocky build":"sturdy build";
-  const hc=h<115?"very small child":h<130?"small child":h<148?"average height child":h<163?"tall child":"very tall child";
-  const bs=bag.vol==="12L"?"small":(bag.vol==="35L"||bag.vol==="30L")?"large":"medium sized";
-  return `Photorealistic lifestyle photo of ${gd}, ${hc} approximately ${h}cm tall, ${build}. Wearing a ${bs} ${bag.en} on their back. Standing upright smiling, 3/4 view, full body head to feet. Natural soft daylight, blurred school or park background. High quality photography, 4k.`;
+let gender = 'boy';
+let bag = {
+  en: 'Beckmann Plus Air school backpack, pink with white dots pattern',
+  hr: 'Beckmann Plus Air',
+  vol: '20L',
+  height: '116-140'
+};
+
+function selG(btn){
+  document.querySelectorAll('.gb').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  gender=btn.dataset.g;
 }
+function selB(c){
+  document.querySelectorAll('.bc').forEach(x=>x.classList.remove('active'));
+  c.classList.add('active');
+  bag={en:c.dataset.bag,hr:c.dataset.baghr,vol:c.dataset.vol,height:c.dataset.height};
+}
+function upd(el,vid,u){
+  const s=u==='god'?' god.':' '+u;
+  document.getElementById(vid).textContent=el.value+s;
+  const p=((+el.value-+el.min)/(+el.max-+el.min)*100).toFixed(1);
+  el.style.setProperty('--pct',p+'%');
+}
+['age','height','weight'].forEach(id=>{
+  const el=document.getElementById(id);
+  const p=((+el.value-+el.min)/(+el.max-+el.min)*100).toFixed(1);
+  el.style.setProperty('--pct',p+'%');
+});
+
+function buildPrompt(g,age,h,w){
+  const gd=g==='boy'
+    ?`a ${age} year old boy with short hair, wearing casual school clothes, t-shirt and pants`
+    :`a ${age} year old girl with longer hair, wearing casual school clothes, t-shirt and skirt`;
+  const bmi=w/((h/100)**2);
+  const build=bmi<16?'slim build':bmi<20?'average healthy build':bmi<24?'slightly stocky build':'sturdy build';
+  const hc=h<115?'very small child':h<130?'small child':h<148?'average height child':h<163?'tall child':'very tall child';
+  return `Photorealistic lifestyle photo of ${gd}, ${hc} approximately ${h}cm tall, ${build}. The child is wearing a ${bag.en} on their back. The backpack fits proportionally to the child body size. Child is standing upright, smiling naturally, 3/4 view toward camera, full body visible head to feet. Soft natural daylight, slightly blurred outdoor school background. Clean, warm, professional photography style. 4k quality.`;
+}
+
 async function gen(){
-  const age=+document.getElementById("age").value;
-  const h=+document.getElementById("height").value;
-  const w=+document.getElementById("weight").value;
+  const age=+document.getElementById('age').value;
+  const h=+document.getElementById('height').value;
+  const w=+document.getElementById('weight').value;
+
+  // Height warning
+  const [minH, maxH] = bag.height.split('-').map(Number);
   const prompt=buildPrompt(gender,age,h,w);
-  const btn=document.getElementById("genBtn");
+  const btn=document.getElementById('genBtn');
   btn.disabled=true;
-  document.getElementById("err").style.display="none";
-  document.getElementById("lo").style.display="flex";
-  document.getElementById("es").style.display="none";
-  document.getElementById("genimg").style.display="none";
-  document.getElementById("istrip").style.display="none";
+  document.getElementById('err').style.display='none';
+  document.getElementById('lo').style.display='flex';
+  document.getElementById('es').style.display='none';
+  document.getElementById('genimg').style.display='none';
+  document.getElementById('fitcard').style.display='none';
+
   try{
-    const res=await fetch("/generate",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({prompt})});
+    const res=await fetch('/generate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prompt})});
     const data=await res.json();
-    if(!res.ok)throw new Error(data.error||"Greška na serveru");
-    const img=document.getElementById("genimg");
-    img.src=data.url;img.style.display="block";
-    const fi=fit(h,w,age,bag.vol);
-    const s=document.getElementById("istrip");
-    s.innerHTML="<h3>📊 Procjena — "+bag.hr+" ("+bag.vol+")</h3><p>"+fi.text+"</p><div class=\"fs\"><div class=\"fd\" style=\"background:"+fi.col+"\"></div><span class=\"fl\" style=\"color:"+fi.col+"\">"+fi.label+"</span></div>";
-    s.style.display="block";
+    if(!res.ok)throw new Error(data.error||'Greška na serveru');
+    const img=document.getElementById('genimg');
+    img.src=data.url;
+    img.style.display='block';
+    const fi=fit(h,w,age,bag.vol,minH,maxH);
+    const fc=document.getElementById('fitcard');
+    fc.innerHTML=`<h3>${bag.hr} · ${bag.vol}</h3><p>${fi.text}</p><div class="fit-score"><div class="fit-dot" style="background:${fi.col}"></div><span class="fit-label" style="color:${fi.col}">${fi.label}</span></div>`;
+    fc.style.display='block';
   }catch(e){
-    document.getElementById("err").textContent="Greška: "+e.message;
-    document.getElementById("err").style.display="block";
-    document.getElementById("es").style.display="block";
+    document.getElementById('err').textContent='Greška: '+e.message;
+    document.getElementById('err').style.display='block';
+    document.getElementById('es').style.display='block';
   }finally{
-    document.getElementById("lo").style.display="none";
+    document.getElementById('lo').style.display='none';
     btn.disabled=false;
   }
 }
-function fit(h,w,age,vol){
-  const v=parseInt(vol);
-  const rec=h<115?12:h<130?16:h<150?20:h<165?25:30;
+
+function fit(h,w,age,vol,minH,maxH){
   const mx=(w*.1).toFixed(1);
-  const d=v-rec;
-  if(Math.abs(d)<=2)return{label:"✅ Odlicno odgovara!",col:"#2EC4B6",text:`Za dijete visine ${h}cm preporucujemo ~${rec}L. Savršen izbor! Maks. punjenje: ${mx}kg.`};
-  if(d>2&&d<=8)return{label:"⚠️ Malo veca",col:"#F4A835",text:`Preporucujemo ~${rec}L. Pazite da je ne prepunite. Maks. punjenje: ${mx}kg.`};
-  if(d>8)return{label:"❌ Prevelika",col:"#FF6B6B",text:`Za visinu ${h}cm preporucujemo max. ${rec}L.`};
-  return{label:"🔵 Nesto manja, prihvatljivo",col:"#7B8FA1",text:`Nesto manja od idealne (${rec}L). Maks. punjenje: ${mx}kg.`};
+  if(h>=minH && h<=maxH){
+    return{label:'✓ Preporučena visina za ovaj model',col:'#5A8A5A',text:`Dijete visine ${h}cm savršeno odgovara ovom modelu (preporučeno ${minH}–${maxH}cm). Maksimalna preporučena težina punjene torbe: ${mx}kg.`};
+  } else if(h<minH){
+    return{label:'↑ Dijete je malo niže od preporučenog',col:'#C4902A',text:`Ovaj model je preporučen za visinu ${minH}–${maxH}cm. Vaše dijete (${h}cm) je malo niže — torba može biti prevelika. Razmotrite Sport Mini model. Maks. težina: ${mx}kg.`};
+  } else {
+    return{label:'↓ Dijete je naraslo iz ovog modela',col:'#C4902A',text:`Ovaj model je preporučen za visinu ${minH}–${maxH}cm. Vaše dijete (${h}cm) je naraslo — pogledajte veće modele. Maks. težina: ${mx}kg.`};
+  }
 }
 </script>
 </body>
