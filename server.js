@@ -1,6 +1,5 @@
 const express = require('express');
 const fetch = require('node-fetch');
-const path = require('path');
 const app = express();
 
 app.use(express.json());
@@ -18,7 +17,7 @@ app.post('/generate', async (req, res) => {
         'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`
       },
       body: JSON.stringify({
-        model: 'dall-e-3',
+        model: 'gpt-image-2',
         prompt: prompt,
         n: 1,
         size: '1024x1024',
@@ -27,13 +26,20 @@ app.post('/generate', async (req, res) => {
     });
 
     const data = await response.json();
+    console.log('OpenAI response status:', response.status);
+    console.log('OpenAI data:', JSON.stringify(data).substring(0, 300));
 
     if (!response.ok) {
       return res.status(response.status).json({ error: data.error?.message || 'OpenAI error' });
     }
 
-    res.json({ url: data.data[0].url });
+    // gpt-image-2 returns base64
+    const imgData = data.data[0];
+    const url = imgData.url || `data:image/png;base64,${imgData.b64_json}`;
+    res.json({ url });
+
   } catch (err) {
+    console.error('Error:', err.message);
     res.status(500).json({ error: err.message });
   }
 });
