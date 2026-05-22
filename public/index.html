@@ -546,19 +546,23 @@ function buildPrompt(g,age,h,w){
   const build=bmi<16?'slim build':bmi<20?'average healthy build':bmi<24?'slightly stocky build':'sturdy build';
   const hc=h<115?'very small child':h<130?'small child':h<148?'average height child':h<163?'tall child':'very tall child';
 
-  // Gender-appropriate bag color
-  let bagColor = '';
-  if(g==='boy'){
-    if(bag.hr.includes('Plus Air')) bagColor = 'teal/green colored';
-    else if(bag.hr.includes('Active Air')) bagColor = 'blue colored';
-    else bagColor = 'blue or dark colored';
+  // Detailed bag description per model and gender
+  let bagDesc = '';
+  if(bag.hr.includes('Plus Air')){
+    bagDesc = g==='boy'
+      ? 'a Beckmann Plus Air school backpack with rigid boxy rectangular shape, flat top lid with magnetic clasp, small front side pouch, teal/blue/green color with geometric pattern'
+      : 'a Beckmann Plus Air school backpack with rigid boxy rectangular shape, flat top lid with magnetic clasp, small front side pouch, pink or purple lavender color with dots or heart pattern';
+  } else if(bag.hr.includes('Active Air')){
+    bagDesc = g==='boy'
+      ? 'a Beckmann Active Air FLX school backpack with rounded ergonomic shape, multiple front zip pockets, side bottle pocket, small detachable front pouch, bright blue color with geometric diamond pattern and action scene graphic on front pocket'
+      : 'a Beckmann Active Air FLX school backpack with rounded ergonomic shape, multiple front zip pockets, side bottle pocket, small detachable front pouch, pink or purple color with pattern';
   } else {
-    if(bag.hr.includes('Plus Air')) bagColor = 'purple/lavender colored';
-    else if(bag.hr.includes('Active Air')) bagColor = 'pink or purple colored';
-    else bagColor = 'pink or pastel colored';
+    bagDesc = g==='boy'
+      ? 'a Beckmann Classic school backpack with classic flap-top design, front zip pocket, side mini pouch, blue or teal camouflage pattern, round badge pin on top'
+      : 'a Beckmann Classic school backpack with classic flap-top design, front zip pocket, side mini pouch, pastel purple lavender watercolor pattern, round badge pin on top, seashell motif';
   }
 
-  return `Photorealistic lifestyle photo of ${gd}, ${hc} approximately ${h}cm tall, ${build}. The child is wearing a ${bagColor} Beckmann ${bag.hr} school backpack on their back. The backpack fits proportionally to the child body size. Child is standing upright, smiling naturally, 3/4 view toward camera, full body visible head to feet. Soft natural daylight, slightly blurred outdoor school background. Clean, warm, professional photography style. 4k quality.`;
+  return `Photorealistic lifestyle photo of ${gd}, ${hc} approximately ${h}cm tall, ${build}. The child is wearing ${bagDesc} on their back. The backpack is proportional to the child height. Child standing upright smiling, 3/4 view toward camera, full body visible from head to feet. Soft natural daylight, blurred school outdoor background. Professional photography, 4k, realistic.`;
 }
 
 async function gen(){
