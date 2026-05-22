@@ -545,7 +545,20 @@ function buildPrompt(g,age,h,w){
   const bmi=w/((h/100)**2);
   const build=bmi<16?'slim build':bmi<20?'average healthy build':bmi<24?'slightly stocky build':'sturdy build';
   const hc=h<115?'very small child':h<130?'small child':h<148?'average height child':h<163?'tall child':'very tall child';
-  return `Photorealistic lifestyle photo of ${gd}, ${hc} approximately ${h}cm tall, ${build}. The child is wearing a ${bag.en} on their back. The backpack fits proportionally to the child body size. Child is standing upright, smiling naturally, 3/4 view toward camera, full body visible head to feet. Soft natural daylight, slightly blurred outdoor school background. Clean, warm, professional photography style. 4k quality.`;
+
+  // Gender-appropriate bag color
+  let bagColor = '';
+  if(g==='boy'){
+    if(bag.hr.includes('Plus Air')) bagColor = 'teal/green colored';
+    else if(bag.hr.includes('Active Air')) bagColor = 'blue colored';
+    else bagColor = 'blue or dark colored';
+  } else {
+    if(bag.hr.includes('Plus Air')) bagColor = 'purple/lavender colored';
+    else if(bag.hr.includes('Active Air')) bagColor = 'pink or purple colored';
+    else bagColor = 'pink or pastel colored';
+  }
+
+  return `Photorealistic lifestyle photo of ${gd}, ${hc} approximately ${h}cm tall, ${build}. The child is wearing a ${bagColor} Beckmann ${bag.hr} school backpack on their back. The backpack fits proportionally to the child body size. Child is standing upright, smiling naturally, 3/4 view toward camera, full body visible head to feet. Soft natural daylight, slightly blurred outdoor school background. Clean, warm, professional photography style. 4k quality.`;
 }
 
 async function gen(){
