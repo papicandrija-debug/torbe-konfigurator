@@ -551,7 +551,7 @@ function buildPrompt(g,age,h,w){
       :'a Beckmann Classic school backpack: soft rounded shape with TRADITIONAL TOP FLAP closed by adjustable buckle straps (not magnetic, not zipper), front zip pocket, ONE small detachable side pouch, round decorative pin badge clipped on top flap, padded back and shoulder straps, chest strap, pastel purple lavender with watercolor pattern and seashell emblem on front pocket';
   }
 
-  return `Photorealistic lifestyle photo of ${gd}, ${hc} approximately ${h}cm tall, ${build}. The child is wearing ${bagDesc} properly on their back with both shoulder straps over both shoulders, backpack sitting firmly and naturally against the child's back. IMPORTANT: show the FULL BODY of the child from head to toe, do not crop. Child standing upright smiling naturally, slightly turned toward camera. Soft natural daylight, blurred school outdoor background. Professional photography, 4k, realistic, natural posture. The backpack must be clearly visible and recognizable.`;
+  return `Photorealistic photo of ${gd}, ${hc} approximately ${h}cm tall, ${build}. The child is WEARING ${bagDesc} — the backpack is FIRMLY ATTACHED to the child's back, both shoulder straps are ON the shoulders, the bag rests naturally against the spine, NOT floating, NOT detached. Full body visible from head to feet, do NOT crop legs or feet. Child standing upright smiling, facing slightly toward camera. Natural daylight, blurred school entrance background. Realistic professional photography, 4k.`;
 }
 
 let timer;
@@ -629,15 +629,17 @@ async function genCompare(){
     const b=selectedBags[i];
     document.getElementById('lsub').textContent=`Generiram ${i+1}/${selectedBags.length}: ${b.hr}...`;
     document.getElementById('loadingTitle').textContent=`Torba ${i+1} od ${selectedBags.length}`;
-    const savedBag=JSON.parse(JSON.stringify(bag));
-    bag=b;
-    const prompt=buildPrompt(gender,age,h,w);
-    bag=savedBag;
+    // Build prompt with this specific bag
+    const currentBag = bag;
+    bag = {en:b.en, hr:b.hr, vol:b.vol, height:b.height};
+    const prompt = buildPrompt(gender, age, h, w);
+    bag = currentBag;
     try{
       const res=await fetch('/generate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prompt})});
       const data=await res.json();
-      if(res.ok)results.push({bag:b,url:data.url});
-    }catch(e){console.error(e);}
+      if(res.ok) results.push({bag:b, url:data.url});
+      else console.error('Error bag', b.hr, await res.text());
+    }catch(e){console.error('Fetch error', b.hr, e);}
   }
   clearInterval(compareTimer);
   document.getElementById('lo').style.display='none';
@@ -647,7 +649,7 @@ async function genCompare(){
       const [minH,maxH]=r.bag.height.split('-').map(Number);
       const fi=fit(h,w,age,r.bag.vol,minH,maxH);
       return `<div class="compare-item">
-        <div class="compare-item-title">🎒 ${r.bag.hr} · ${r.bag.vol}</div>
+        <div class="compare-item-title">${r.bag.hr} · ${r.bag.vol}</div>
         <img src="${r.url}" alt="${r.bag.hr}">
         <div class="fit-card" style="display:block"><p>${fi.text}</p>
         <div class="fit-score"><div class="fit-dot" style="background:${fi.col}"></div><span class="fit-label" style="color:${fi.col}">${fi.label}</span></div></div>
