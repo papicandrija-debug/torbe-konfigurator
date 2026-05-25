@@ -738,6 +738,12 @@ async function gen(){
   document.getElementById('es').style.display='none';
   document.getElementById('genimg').style.display='none';
   document.getElementById('fitcard').style.display='none';
+  document.getElementById('loadingTitle').textContent='Generiram prikaz...';
+  // Start timer
+  let secs = 0;
+  const timerEl = document.getElementById('timerDisplay');
+  timerEl.textContent = '0s';
+  const timer = setInterval(()=>{ secs++; timerEl.textContent=secs+'s'; }, 1000);
 
   try{
     const res=await fetch('/generate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prompt})});
@@ -755,6 +761,7 @@ async function gen(){
     document.getElementById('err').style.display='block';
     document.getElementById('es').style.display='block';
   }finally{
+    clearInterval(timer);
     document.getElementById('lo').style.display='none';
     btn.disabled=false;
   }
