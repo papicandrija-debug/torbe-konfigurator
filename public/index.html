@@ -264,10 +264,13 @@ input[type=range]::-webkit-slider-thumb {
 
 #genimg {
   display: none;
-  width: 100%;
+  width: auto;
+  max-width: 100%;
+  max-height: 420px;
   border-radius: 2px;
   box-shadow: 0 8px 32px rgba(30,45,90,0.12);
   margin-bottom: 16px;
+  object-fit: contain;
 }
 .fit-card {
   background: var(--cream);
@@ -291,7 +294,7 @@ input[type=range]::-webkit-slider-thumb {
   font-size: 0.95rem; font-weight: 600;
   color: var(--navy); margin-bottom: 10px;
 }
-.compare-item img { width: 100%; margin-bottom: 10px; }
+.compare-item img { width: auto; max-width: 100%; max-height: 320px; object-fit: contain; margin-bottom: 10px; }
 
 .err { background: #fff0f0; border: 1px solid #ffcccc; padding: 10px 14px; color: #cc3333; font-size: 0.78rem; display: none; margin-top: 8px; }
 
@@ -548,7 +551,7 @@ function buildPrompt(g,age,h,w){
       :'a Beckmann Classic school backpack: soft rounded shape with TRADITIONAL TOP FLAP closed by adjustable buckle straps (not magnetic, not zipper), front zip pocket, ONE small detachable side pouch, round decorative pin badge clipped on top flap, padded back and shoulder straps, chest strap, pastel purple lavender with watercolor pattern and seashell emblem on front pocket';
   }
 
-  return `Photorealistic lifestyle photo of ${gd}, ${hc} approximately ${h}cm tall, ${build}. The child is wearing ${bagDesc} properly on their back with both shoulder straps over both shoulders, backpack sitting firmly and naturally against the child's back. Child standing upright smiling naturally, slightly turned toward camera, full body visible from head to feet. Soft natural daylight, blurred school outdoor background. Professional photography, 4k, realistic, natural posture.`;
+  return `Photorealistic lifestyle photo of ${gd}, ${hc} approximately ${h}cm tall, ${build}. The child is wearing ${bagDesc} properly on their back with both shoulder straps over both shoulders, backpack sitting firmly and naturally against the child's back. IMPORTANT: show the FULL BODY of the child from head to toe, do not crop. Child standing upright smiling naturally, slightly turned toward camera. Soft natural daylight, blurred school outdoor background. Professional photography, 4k, realistic, natural posture. The backpack must be clearly visible and recognizable.`;
 }
 
 let timer;
