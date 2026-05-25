@@ -53,7 +53,7 @@ header {
 /* 3-COLUMN LAYOUT */
 .configurator {
   display: grid;
-  grid-template-columns: 260px 1fr 380px;
+  grid-template-columns: 260px 320px 1fr;
   gap: 0;
   min-height: calc(100vh - 130px);
 }
@@ -148,7 +148,7 @@ input[type=range]::-webkit-slider-thumb {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 16px 12px 12px;
+  padding: 12px 8px 10px;
   text-align: center;
 }
 .bc:hover { border-color: var(--brown); transform: translateY(-2px); box-shadow: 0 4px 16px rgba(0,0,0,0.07); }
@@ -157,9 +157,9 @@ input[type=range]::-webkit-slider-thumb {
 .bc.active.compare-selected { border-color: var(--navy); }
 
 .bc-img {
-  width: 100px; height: 110px;
+  width: 72px; height: 80px;
   object-fit: contain;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
 }
 .bc-name {
   font-weight: 600;
@@ -607,10 +607,21 @@ async function genCompare(){
   const btn=document.getElementById('compareBtn');
   btn.disabled=true;
   const results=[];
+  // Start one continuous timer for all images
+  let totalSecs = 0;
+  document.getElementById('timerDisplay').textContent = '0s';
+  document.getElementById('lo').style.display = 'flex';
+  document.getElementById('es').style.display = 'none';
+  document.getElementById('genimg').style.display = 'none';
+  document.getElementById('fitcard').style.display = 'none';
+  document.getElementById('compareResults').style.display = 'none';
+  document.getElementById('err').style.display = 'none';
+  const compareTimer = setInterval(()=>{ totalSecs++; document.getElementById('timerDisplay').textContent=totalSecs+'s'; }, 1000);
+
   for(let i=0;i<selectedBags.length;i++){
     const b=selectedBags[i];
     document.getElementById('lsub').textContent=`Generiram ${i+1}/${selectedBags.length}: ${b.hr}...`;
-    showLoading(`Torba ${i+1} od ${selectedBags.length}`);
+    document.getElementById('loadingTitle').textContent=`Torba ${i+1} od ${selectedBags.length}`;
     const savedBag=JSON.parse(JSON.stringify(bag));
     bag=b;
     const prompt=buildPrompt(gender,age,h,w);
@@ -621,7 +632,8 @@ async function genCompare(){
       if(res.ok)results.push({bag:b,url:data.url});
     }catch(e){console.error(e);}
   }
-  hideLoading();
+  clearInterval(compareTimer);
+  document.getElementById('lo').style.display='none';
   if(results.length>0){
     const cr=document.getElementById('compareResults');
     cr.innerHTML=results.map(r=>{
