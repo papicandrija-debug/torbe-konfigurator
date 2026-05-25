@@ -266,7 +266,7 @@ input[type=range]::-webkit-slider-thumb {
   display: none;
   width: auto;
   max-width: 100%;
-  max-height: 420px;
+  max-height: 640px;
   border-radius: 2px;
   box-shadow: 0 8px 32px rgba(30,45,90,0.12);
   margin-bottom: 16px;
@@ -660,12 +660,11 @@ async function genCompare(){
 }
 
 function fit(h,w,age,vol,minH,maxH){
-  const mx=(w*.1).toFixed(1);
   if(h>=minH&&h<=maxH)
-    return{label:'✓ Preporučena visina za ovaj model',col:'#5A8A5A',text:`Dijete visine ${h}cm savršeno odgovara (preporučeno ${minH}–${maxH}cm). Maks. punjenje: ${mx}kg.`};
+    return{label:'✓ Preporučena visina za ovaj model',col:'#5A8A5A',text:`Dijete visine ${h}cm savršeno odgovara ovom modelu (preporučena visina ${minH}–${maxH}cm).`};
   if(h<minH)
-    return{label:'↑ Dijete je niže od preporučenog',col:'#C4902A',text:`Preporučeno ${minH}–${maxH}cm. Vaše dijete (${h}cm) je malo niže — torba može biti prevelika. Maks. punjenje: ${mx}kg.`};
-  return{label:'↓ Dijete je naraslo iz ovog modela',col:'#C4902A',text:`Preporučeno ${minH}–${maxH}cm. Vaše dijete (${h}cm) je naraslo — pogledajte veće modele. Maks. punjenje: ${mx}kg.`};
+    return{label:'↑ Dijete je niže od preporučenog',col:'#C4902A',text:`Ovaj model je preporučen za visinu ${minH}–${maxH}cm. Vaše dijete (${h}cm) je malo niže — torba može biti prevelika.`};
+  return{label:'↓ Dijete je naraslo iz ovog modela',col:'#C4902A',text:`Ovaj model je preporučen za visinu ${minH}–${maxH}cm. Vaše dijete (${h}cm) je naraslo — razmotrite veći model.`};
 }
 </script>
 </body>
