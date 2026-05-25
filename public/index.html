@@ -286,9 +286,9 @@ input[type=range]::-webkit-slider-thumb {
 .fit-dot { width: 8px; height: 8px; border-radius: 50%; }
 .fit-label { font-size: 0.75rem; font-weight: 600; }
 
-.compare-results { display: none; flex-direction: column; gap: 20px; overflow-y: auto; }
-.compare-item { border-bottom: 1px solid var(--border); padding-bottom: 20px; }
-.compare-item:last-child { border-bottom: none; padding-bottom: 0; }
+.compare-results { display: none; flex-direction: row; gap: 16px; overflow-x: auto; align-items: flex-start; }
+.compare-item { border: 1px solid var(--border); padding: 16px; flex: 1; min-width: 220px; }
+
 .compare-item-title {
   font-family: 'Cormorant Garamond', serif;
   font-size: 0.95rem; font-weight: 600;
@@ -547,7 +547,7 @@ function buildPrompt(g,age,h,w){
   } else {
     // Classic: soft construction, traditional flap-top with buckles (NOT zipper), front zip pocket, small side pouch, round pin badge on top flap
     bagDesc=g==='boy'
-      ?'a Beckmann Classic school backpack: rigid tall rectangular shape, LARGE TOP FLAP that folds forward, flap secured by TWO BUCKLE CLIP STRAPS on left and right sides of the bag (clips that snap shut, clearly visible), round decorative pin badge clipped on top flap, Beckmann script logo plate on upper front below flap, large graphic front pocket on lower half with zipper, ONE small zip pencil case pouch clipped on the LOWER LEFT side, zip side pocket on RIGHT side for water bottle, reflective BECKMANN name strip at very bottom, short carry handle on top, padded shoulder straps, chest strap, padded hip belt, mesh back panel, colorful graphic pattern'
+      ?'a Beckmann Classic school backpack: rigid tall rectangular shape, LARGE TOP FLAP that covers the top and folds forward, the flap is held down by TWO VISIBLE PLASTIC BUCKLE CLIPS - one on each side of the bag body (NOT magnetic, NOT zipper - these are snap buckles like on a hiking bag), round decorative pin badge clipped on top flap, Beckmann script logo plate on upper front below flap, large graphic front pocket on lower half with curved zipper, ONE small zip pencil case pouch clipped on the LOWER LEFT side, zip side pocket on RIGHT side for water bottle, reflective BECKMANN name strip at very bottom, short carry handle on top, padded shoulder straps, chest strap, padded hip belt, colorful graphic pattern'
       :'a Beckmann Classic school backpack: soft rounded shape with TRADITIONAL TOP FLAP closed by adjustable buckle straps (not magnetic, not zipper), front zip pocket, ONE small detachable side pouch, round decorative pin badge clipped on top flap, padded back and shoulder straps, chest strap, pastel purple lavender with watercolor pattern and seashell emblem on front pocket';
   }
 
@@ -645,17 +645,22 @@ async function genCompare(){
   document.getElementById('lo').style.display='none';
   if(results.length>0){
     const cr=document.getElementById('compareResults');
-    cr.innerHTML=results.map(r=>{
+    cr.innerHTML=`<div style="display:flex;flex-direction:row;gap:16px;width:100%;">` + results.map(r=>{
       const [minH,maxH]=r.bag.height.split('-').map(Number);
       const fi=fit(h,w,age,r.bag.vol,minH,maxH);
-      return `<div class="compare-item">
-        <div class="compare-item-title">${r.bag.hr} · ${r.bag.vol}</div>
-        <img src="${r.url}" alt="${r.bag.hr}">
-        <div class="fit-card" style="display:block"><p>${fi.text}</p>
-        <div class="fit-score"><div class="fit-dot" style="background:${fi.col}"></div><span class="fit-label" style="color:${fi.col}">${fi.label}</span></div></div>
+      return `<div style="flex:1;min-width:0;border:1px solid var(--border);padding:14px;">
+        <div style="font-family:'Cormorant Garamond',serif;font-size:0.95rem;font-weight:600;color:var(--navy);margin-bottom:10px;">${r.bag.hr} · ${r.bag.vol}</div>
+        <img src="${r.url}" alt="${r.bag.hr}" style="width:100%;max-height:340px;object-fit:contain;display:block;margin-bottom:10px;">
+        <div style="background:var(--cream);border:1px solid var(--border);border-left:3px solid var(--brown);padding:12px 14px;">
+          <p style="font-size:0.78rem;color:var(--text-light);line-height:1.5;">${fi.text}</p>
+          <div style="display:flex;align-items:center;gap:6px;margin-top:8px;">
+            <div style="width:8px;height:8px;border-radius:50%;background:${fi.col};"></div>
+            <span style="font-size:0.75rem;font-weight:600;color:${fi.col};">${fi.label}</span>
+          </div>
+        </div>
       </div>`;
-    }).join('');
-    cr.style.display='flex';
+    }).join('') + `</div>`;
+    cr.style.display='block';
   }
   btn.disabled=false;
   btn.textContent=`Usporedi ${selectedBags.length} torbe →`;
