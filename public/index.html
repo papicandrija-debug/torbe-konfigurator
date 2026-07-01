@@ -676,29 +676,52 @@ async function generate() {
   const genderHr = gender === 'djevojčica' ? 'girl' : 'boy';
   const isNewborn = m.scene === 'newborn';
 
+  // Gender-based colors — only real Mamino colors, NO animal prints or invented patterns
+  const cloudColors = {
+    'djevojčica': 'solid plain white muslin OR solid plain lilac (light purple) muslin OR solid plain beige muslin — completely plain, NO prints, NO animal motifs, NO stars, NO dots, NO decorations on the fabric',
+    'dječak': 'solid plain blue muslin OR solid plain mint (light green) muslin OR solid plain white muslin — completely plain, NO prints, NO animal motifs, NO stars, NO dots, NO decorations on the fabric'
+  };
+  const sleepyColors = {
+    'djevojčica': 'solid plain white muslin OR solid plain lilac (light purple) muslin OR solid plain mint muslin OR solid plain beige — completely plain solid color fabric, absolutely NO animal prints, NO bear motifs, NO stars, NO polka dots, NO patterns whatsoever',
+    'dječak': 'solid plain blue muslin OR solid plain mint (light green) muslin OR solid plain white OR solid plain beige — completely plain solid color fabric, absolutely NO animal prints, NO bear motifs, NO stars, NO polka dots, NO patterns whatsoever'
+  };
+
+  const colorCloud = cloudColors[gender];
+  const colorSleepy = sleepyColors[gender];
+
   let prompt;
   if (isNewborn) {
-    prompt = `Realistic lifestyle photo of a peaceful newborn baby sleeping in a white wooden baby crib.
-The baby is wearing a soft Mamino Cloud™ baby sleep sack: ${m.color}, ${m.shape}.
-Gender: ${genderHr}. Age: ${age}.
+    prompt = `Realistic lifestyle photo of a peaceful newborn baby (${genderHr}) sleeping in a white wooden baby crib.
+The baby is tucked into a baby sleep sack. The sleep sack is: ${colorCloud}.
+Shape: closed cocoon sleep sack without legs, double zipper down the front, soft muslin fabric, very simple and minimal design.
+NO text, NO logos, NO labels visible on the sleep sack.
 The crib has white wooden rails, a light cotton fitted sheet. Soft natural light from a nearby window.
-Cozy, minimal Scandinavian-style nursery room. Warm, soft tones. Professional photography, shallow depth of field.
-The sleep sack is clearly visible and well-lit. Photo style: warm lifestyle baby photography.`;
+Cozy minimal Scandinavian-style nursery. Warm soft tones. Professional photography, shallow depth of field.
+The sleep sack must be clearly visible and well-lit as the main focus.`;
   } else {
     const season = document.getElementById('season').value;
     const roomMood = {
-      'proljeće': 'bright airy room with soft morning light, spring flowers on the windowsill',
-      'ljeto': 'bright sunny nursery room, light curtains, cheerful atmosphere',
-      'jesen': 'cozy warm nursery room, warm evening light, autumn colors in decor',
-      'zima': 'cozy warm nursery room, soft lamp light, winter atmosphere, maybe snow outside the window'
+      'proljeće': 'bright airy nursery room with soft morning light',
+      'ljeto': 'bright sunny nursery room with light curtains',
+      'jesen': 'cozy warm nursery room with warm evening lamp light',
+      'zima': 'cozy warm nursery room with soft lamp light, winter atmosphere'
     }[season] || 'cozy nursery room';
 
-    prompt = `Realistic lifestyle photo of a happy ${genderHr} child, age ${age}, standing in a ${roomMood}.
-The child is wearing a Mamino Sleepy™ baby/toddler sleep sack with legs: ${m.color}, ${m.shape}.
-The child is standing and smiling, arms slightly out to the sides, full body visible.
-The sleep sack with legs is clearly visible — this is the main product.
-Professional lifestyle photography, warm tones, natural light. Clean background.
-Photo style: warm, soft, family lifestyle photography.`;
+    const fabricDesc = {
+      proljece: 'lightweight double-layer muslin fabric, very light and airy',
+      ljeto: 'ultra-light single-layer muslin fabric, almost translucent, very thin',
+      jesen: 'medium weight jersey fabric with soft fleece inner lining, slightly thicker',
+      zima: 'thick padded jersey fabric with quilted look, warm and puffy'
+    }[selectedModel] || 'soft muslin fabric';
+
+    prompt = `Realistic lifestyle photo of a happy ${genderHr} toddler/child, age ${age}, standing upright in a ${roomMood}.
+The child is wearing a wearable blanket sleep sack with separate legs (like a wearable sleeping bag with leg holes). 
+The sleep sack color: ${colorSleepy}.
+Fabric: ${fabricDesc}.
+Shape: sleep sack with two separate leg openings at the bottom, zipper down the front, sleeveless (no arms covered), fits snugly on the torso.
+The child stands smiling, full body visible, arms slightly out.
+NO text, NO logos, NO labels visible on the sleep sack. Plain solid color only.
+Professional lifestyle photography, warm tones, natural light.`;
   }
 
   try {
