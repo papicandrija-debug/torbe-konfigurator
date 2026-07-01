@@ -735,41 +735,35 @@ Professional lifestyle photography, warm tones, natural light, shallow depth of 
   try {
     const season = document.getElementById('season').value;
 
-    // Korak 1: pokreni job, odmah dobij jobId
-    const startRes = await fetch('/generate', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ model: selectedModel, gender, age, season })
-    });
-    const startData = await startRes.json();
-    if (startData.error) throw new Error(startData.error);
-    const jobId = startData.jobId;
-
-    // Korak 2: polling svakih 3 sekunde, max 5 minuta
+    // SSE — otvorena konekcija dok AI generira
     const result = await new Promise((resolve, reject) => {
-      let attempts = 0;
-      const maxAttempts = 100; // 100 x 3s = 5 minuta
-      const poll = setInterval(async () => {
-        attempts++;
-        try {
-          const statusRes = await fetch(`/status/${jobId}`);
-          const statusData = await statusRes.json();
+      const params = new URLSearchParams({ model: selectedModel, gender, age, season });
+      const evtSource = new EventSource(`/generate-stream?${params}`);
 
-          if (statusData.status === 'done') {
-            clearInterval(poll);
-            resolve(statusData);
-          } else if (statusData.status === 'error') {
-            clearInterval(poll);
-            reject(new Error(statusData.error || 'Job failed'));
-          } else if (attempts >= maxAttempts) {
-            clearInterval(poll);
-            reject(new Error('Timeout — generiranje traje predugo'));
-          }
-        } catch (e) {
-          clearInterval(poll);
-          reject(e);
+      evtSource.addEventListener('status', (e) => {
+        const data = JSON.parse(e.data);
+        document.querySelector('.loading-msg').textContent = data.message || 'Generiranje...';
+      });
+
+      evtSource.addEventListener('done', (e) => {
+        evtSource.close();
+        resolve(JSON.parse(e.data));
+      });
+
+      evtSource.addEventListener('error', (e) => {
+        evtSource.close();
+        try {
+          const data = JSON.parse(e.data);
+          reject(new Error(data.message || 'Greška'));
+        } catch {
+          reject(new Error('Veza prekinuta'));
         }
-      }, 3000);
+      });
+
+      evtSource.onerror = () => {
+        evtSource.close();
+        reject(new Error('SSE veza prekinuta'));
+      };
     });
 
     stopTimer();
