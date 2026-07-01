@@ -1,169 +1,45 @@
 const express = require('express');
 const https = require('https');
 const http = require('http');
+const FormData = require('form-data');
 const app = express();
 app.use(express.json());
 app.use(express.static('public'));
 
-// Preuzmi sliku s URL-a kao base64
-function fetchImageAsBase64(imageUrl) {
+// Preuzmi sliku s URL-a kao Buffer
+function fetchImageBuffer(imageUrl) {
   return new Promise((resolve, reject) => {
     const protocol = imageUrl.startsWith('https') ? https : http;
-    const req = protocol.get(imageUrl, (res) => {
+    protocol.get(imageUrl, (res) => {
       if (res.statusCode === 301 || res.statusCode === 302) {
-        return fetchImageAsBase64(res.headers.location).then(resolve).catch(reject);
+        return fetchImageBuffer(res.headers.location).then(resolve).catch(reject);
       }
       const chunks = [];
       res.on('data', chunk => chunks.push(chunk));
-      res.on('end', () => {
-        const buffer = Buffer.concat(chunks);
-        resolve({
-          base64: buffer.toString('base64'),
-          mime: res.headers['content-type'] || 'image/jpeg'
-        });
-      });
+      res.on('end', () => resolve({
+        buffer: Buffer.concat(chunks),
+        mime: res.headers['content-type'] || 'image/jpeg'
+      }));
       res.on('error', reject);
-    });
-    req.on('error', reject);
+    }).on('error', reject);
   });
 }
 
-// Korak 1: gpt-4o gleda sliku i opisuje proizvod
-function describeProductWithVision(imageBase64, imageMime, gender, age, season, model) {
-  return new Promise((resolve, reject) => {
-    const isNewborn = model === 'cloud';
-    
-    const genderHr = gender === 'djevojčica' ? 'girl' : 'boy';
-    const sceneDesc = isNewborn
-      ? `a peaceful sleeping newborn ${genderHr} lying in a white wooden baby crib in a cozy Scandinavian nursery with soft natural light`
-      : `a happy smiling ${genderHr} toddler age ${age} standing upright in a cozy nursery room with ${
-          season === 'proljeće' ? 'soft morning light' :
-          season === 'ljeto' ? 'bright sunny daylight' :
-          season === 'jesen' ? 'warm evening lamp light' : 'soft warm lamp light'
-        }`;
-
-    const labelInstruction = isNewborn
-      ? `There is a small "mamino" woven label sewn on the side seam near the bottom of the sleep sack.`
-      : `There is a small "mamino" woven label sewn on the outer side seam of the left leg, near the ankle.`;
-
-    const bodyPart = JSON.stringify({
-      model: 'gpt-4o',
-      max_tokens: 800,
-      messages: [
-        {
-          role: 'user',
-          content: [
-            {
-              type: 'image_url',
-              image_url: {
-                url: `data:${imageMime};base64,${imageBase64}`,
-                detail: 'high'
-              }
-            },
-            {
-              type: 'text',
-              text: `You are a professional product photographer's assistant. 
-              
-Look at this baby sleep sack product image carefully. Note the exact shape, structure, color, fabric texture, zipper placement, leg shape, and whether feet are open or closed.
-
-Now write a detailed image generation prompt (for DALL-E/image AI) that shows:
-- ${sceneDesc}
-- wearing THIS EXACT sleep sack from the image — same shape, same color, same fabric texture, same zipper placement
-- ${labelInstruction}
-- The fabric must be PLAIN SOLID COLOR — no prints, no patterns, no animal motifs, no decorations
-- NO other brand logos or text visible except the small "mamino" label described above
-
-Write ONLY the image generation prompt, nothing else. Be very specific about the garment shape based on what you see in the image.`
-            }
-          ]
-        }
-      ]
-    });
-
-    const options = {
-      hostname: 'api.openai.com',
-      path: '/v1/chat/completions',
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
-        'Content-Length': Buffer.byteLength(bodyPart)
-      },
-      timeout: 60000
-    };
-
-    const req = https.request(options, (res) => {
-      let data = '';
-      res.on('data', chunk => data += chunk);
-      res.on('end', () => {
-        try {
-          const parsed = JSON.parse(data);
-          if (parsed.error) return reject(new Error(parsed.error.message));
-          const prompt = parsed.choices?.[0]?.message?.content;
-          if (!prompt) return reject(new Error('No prompt from gpt-4o: ' + data.substring(0, 200)));
-          resolve(prompt);
-        } catch (e) {
-          reject(new Error('Parse error: ' + data.substring(0, 200)));
-        }
-      });
-    });
-
-    req.on('error', reject);
-    req.on('timeout', () => { req.destroy(); reject(new Error('Vision timeout')); });
-    req.write(bodyPart);
-    req.end();
-  });
-}
-
-// Korak 2: gpt-image-2 generira sliku na temelju prompta
-function generateImage(prompt) {
-  return new Promise((resolve, reject) => {
-    const body = JSON.stringify({
-      model: 'gpt-image-2',
-      prompt: prompt,
-      n: 1,
-      size: '1024x1024',
-      quality: 'medium'
-    });
-
-    const options = {
-      hostname: 'api.openai.com',
-      path: '/v1/images/generations',
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
-        'Content-Length': Buffer.byteLength(body)
-      },
-      timeout: 240000
-    };
-
-    const req = https.request(options, (res) => {
-      let data = '';
-      res.on('data', chunk => data += chunk);
-      res.on('end', () => {
-        try {
-          resolve({ status: res.statusCode, body: JSON.parse(data) });
-        } catch (e) {
-          reject(new Error('Parse error: ' + data.substring(0, 200)));
-        }
-      });
-    });
-
-    req.on('error', reject);
-    req.on('timeout', () => { req.destroy(); reject(new Error('Image gen timeout')); });
-    req.write(body);
-    req.end();
-  });
-}
-
-// Slike proizvoda s mamino.hr
+// Slike proizvoda s mamino.hr — čiste bijele pozadine za bolju referencu
 const modelImages = {
   cloud:    'https://mamino.hr/cdn/shop/files/Vreca_za_spavanje_novorodjence.png?v=1768914766',
   proljece: 'https://mamino.hr/cdn/shop/files/Mamino_white_product_photos_2_1.jpg?v=1754995072',
   ljeto:    'https://mamino.hr/cdn/shop/files/MAMINO_2-49.jpg?v=1748352986',
   jesen:    'https://mamino.hr/cdn/shop/files/mamino_jesen_2025-30.jpg?v=1758780056',
   zima:     'https://mamino.hr/cdn/shop/files/MAMINO_2-53.jpg?v=1768914766'
+};
+
+const modelNames = {
+  cloud:    'Cloud™ Vreća za Spavanje',
+  proljece: 'Sleepy™ Proljeće',
+  ljeto:    'Sleepy™ Ljeto',
+  jesen:    'Sleepy™ Jesen',
+  zima:     'Sleepy™ Zima'
 };
 
 app.post('/generate', async (req, res) => {
@@ -173,31 +49,105 @@ app.post('/generate', async (req, res) => {
   res.setHeader('Connection', 'keep-alive');
 
   try {
-    // Korak 1: preuzmi sliku proizvoda
-    console.log('Fetching product image for:', model);
-    const imageUrl = modelImages[model];
-    const { base64, mime } = await fetchImageAsBase64(imageUrl);
-    console.log('Product image fetched, size:', base64.length);
+    // Preuzmi sliku proizvoda
+    console.log('Fetching product image:', model);
+    const { buffer, mime } = await fetchImageBuffer(modelImages[model]);
+    console.log('Image fetched, bytes:', buffer.length, 'mime:', mime);
 
-    // Korak 2: gpt-4o opisuje proizvod i piše prompt
-    console.log('Asking gpt-4o to describe product...');
-    const imagePrompt = await describeProductWithVision(base64, mime, gender, age, season, model);
-    console.log('GPT-4o prompt:', imagePrompt.substring(0, 300));
+    const isNewborn = model === 'cloud';
+    const genderWord = gender === 'djevojčica' ? 'girl' : 'boy';
 
-    // Korak 3: gpt-image-2 generira sliku
-    console.log('Generating final image...');
-    const { status, body } = await generateImage(imagePrompt);
-    console.log('Image gen status:', status);
+    const roomMood = {
+      proljeće: 'bright airy Scandinavian nursery with soft natural morning light, white wooden furniture',
+      ljeto: 'bright sunny nursery room with light linen curtains and warm daylight',
+      jesen: 'cozy warm nursery with warm lamp light and wooden accents',
+      zima: 'cozy warm nursery with soft lamp light, knitted blanket in background'
+    }[season] || 'cozy Scandinavian nursery with soft natural light';
 
-    if (status !== 200) {
-      return res.status(status).json({ error: body.error?.message || 'OpenAI error' });
+    let prompt;
+    if (isNewborn) {
+      prompt = `Realistic professional lifestyle photo of a peaceful sleeping newborn baby (${genderWord}) lying in a white wooden baby crib in a ${roomMood}.
+
+The baby is dressed in the EXACT sleep sack shown in the reference image — same color, same pattern, same shape, same zipper placement, same fabric texture. Reproduce the garment faithfully.
+
+The sleep sack label "mamino" is a small woven tag sewn on the side seam at the bottom of the sleep sack.
+
+The baby is sleeping peacefully, full body visible in the crib. White wooden crib rails visible. Soft natural light. Warm lifestyle photography, shallow depth of field. No other text or logos visible.`;
+    } else {
+      prompt = `Realistic professional lifestyle photo of a happy smiling ${genderWord} toddler, age ${age}, standing upright in a ${roomMood}.
+
+The child is dressed in the EXACT sleep sack with legs shown in the reference image — same color, same pattern (if any), same shape, same zipper placement, same leg shape, same fabric texture, same feet (open or closed). Reproduce the garment faithfully.
+
+The sleep sack label "mamino" is a small woven tag sewn on the outer side seam of the left leg near the ankle.
+
+The child stands smiling, full body visible from head to toe, arms slightly out to sides. Warm lifestyle photography, natural light, shallow depth of field. No other text or logos visible.`;
     }
 
-    if (!body.data?.[0]) {
-      return res.status(500).json({ error: 'No image: ' + JSON.stringify(body).substring(0, 200) });
+    console.log('Building multipart request with image...');
+
+    // Šalji na /v1/images/edits s referentnom slikom
+    const form = new FormData();
+    form.append('model', 'gpt-image-2');
+    form.append('prompt', prompt);
+    form.append('n', '1');
+    form.append('size', '1024x1024');
+    form.append('quality', 'medium');
+
+    // Dodaj referentnu sliku
+    const ext = mime.includes('png') ? 'png' : 'jpg';
+    form.append('image[]', buffer, {
+      filename: `product.${ext}`,
+      contentType: mime
+    });
+
+    const formHeaders = form.getHeaders();
+    const formBuffer = await new Promise((resolve, reject) => {
+      const chunks = [];
+      form.on('data', chunk => chunks.push(chunk));
+      form.on('end', () => resolve(Buffer.concat(chunks)));
+      form.on('error', reject);
+    });
+
+    const options = {
+      hostname: 'api.openai.com',
+      path: '/v1/images/edits',
+      method: 'POST',
+      headers: {
+        ...formHeaders,
+        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+        'Content-Length': formBuffer.length
+      },
+      timeout: 240000
+    };
+
+    const result = await new Promise((resolve, reject) => {
+      const apiReq = https.request(options, (apiRes) => {
+        let data = '';
+        apiRes.on('data', chunk => data += chunk);
+        apiRes.on('end', () => {
+          try {
+            resolve({ status: apiRes.statusCode, body: JSON.parse(data) });
+          } catch (e) {
+            reject(new Error('Parse error: ' + data.substring(0, 300)));
+          }
+        });
+      });
+      apiReq.on('error', reject);
+      apiReq.on('timeout', () => { apiReq.destroy(); reject(new Error('Timeout')); });
+      apiReq.write(formBuffer);
+      apiReq.end();
+    });
+
+    console.log('OpenAI status:', result.status);
+    console.log('Response:', JSON.stringify(result.body).substring(0, 300));
+
+    if (result.status !== 200) {
+      return res.status(result.status).json({ error: result.body.error?.message || 'OpenAI error' });
     }
 
-    const imgData = body.data[0];
+    const imgData = result.body.data?.[0];
+    if (!imgData) return res.status(500).json({ error: 'No image data' });
+
     if (imgData.url) return res.json({ url: imgData.url });
     if (imgData.b64_json) return res.json({ url: `data:image/png;base64,${imgData.b64_json}` });
 
