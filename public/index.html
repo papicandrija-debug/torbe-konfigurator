@@ -734,28 +734,45 @@ Professional lifestyle photography, warm tones, natural light, shallow depth of 
 
   try {
     const season = document.getElementById('season').value;
-    const res = await fetch('/generate', {
+
+    // Korak 1: pokreni job, odmah dobij jobId
+    const startRes = await fetch('/generate', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ 
-        model: selectedModel,
-        gender,
-        age,
-        season
-      })
+      body: JSON.stringify({ model: selectedModel, gender, age, season })
     });
-    const data = await res.json();
+    const startData = await startRes.json();
+    if (startData.error) throw new Error(startData.error);
+    const jobId = startData.jobId;
+
+    // Korak 2: polling svakih 3 sekunde
+    const result = await new Promise((resolve, reject) => {
+      const poll = setInterval(async () => {
+        try {
+          const statusRes = await fetch(`/status/${jobId}`);
+          const statusData = await statusRes.json();
+
+          if (statusData.status === 'done') {
+            clearInterval(poll);
+            resolve(statusData);
+          } else if (statusData.status === 'error') {
+            clearInterval(poll);
+            reject(new Error(statusData.error || 'Job failed'));
+          }
+          // pending/processing → nastavi čekati
+        } catch (e) {
+          clearInterval(poll);
+          reject(e);
+        }
+      }, 3000);
+    });
+
     stopTimer();
 
-    if (data.error) throw new Error(data.error);
-
-    const imgSrc = data.url || (data.b64 ? 'data:image/png;base64,' + data.b64 : null);
-    if (!imgSrc) throw new Error('Nema slike u odgovoru');
-
-    // Show result
+    // Prikaži rezultat
     document.getElementById('loadingState').classList.remove('active');
     document.getElementById('resultWrap').classList.add('active');
-    document.getElementById('resultImg').src = imgSrc;
+    document.getElementById('resultImg').src = result.url;
     document.getElementById('resultModelName').textContent = m.name;
     document.getElementById('shopLink').href = shopLinks[selectedModel];
 
