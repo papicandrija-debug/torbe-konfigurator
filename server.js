@@ -23,7 +23,7 @@ function openAIRequest(prompt) {
         'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
         'Content-Length': Buffer.byteLength(body)
       },
-      timeout: 240000 // 4 minute
+      timeout: 240000
     };
 
     const req = https.request(options, (res) => {
@@ -41,7 +41,7 @@ function openAIRequest(prompt) {
     req.on('error', reject);
     req.on('timeout', () => {
       req.destroy();
-      reject(new Error('Request timeout after 4 minutes'));
+      reject(new Error('Request timeout'));
     });
 
     req.write(body);
@@ -53,22 +53,33 @@ app.post('/generate', async (req, res) => {
   const { prompt } = req.body;
   if (!prompt) return res.status(400).json({ error: 'Missing prompt' });
 
-  // Keep connection alive
   res.setHeader('Connection', 'keep-alive');
 
   try {
     console.log('Starting image generation...');
     const { status, body } = await openAIRequest(prompt);
     console.log('OpenAI status:', status);
-    console.log('OpenAI response:', JSON.stringify(body).substring(0, 300));
+    console.log('OpenAI full response:', JSON.stringify(body).substring(0, 500));
 
     if (status !== 200) {
       return res.status(status).json({ error: body.error?.message || 'OpenAI error' });
     }
 
+    if (!body.data || !body.data[0]) {
+      return res.status(500).json({ error: 'OpenAI nije vratio sliku. Response: ' + JSON.stringify(body).substring(0, 200) });
+    }
+
     const imgData = body.data[0];
-    const url = imgData.url || `data:image/png;base64,${imgData.b64_json}`;
-    res.json({ url });
+    console.log('Image data keys:', Object.keys(imgData));
+
+    // Provjeri url ili b64_json
+    if (imgData.url) {
+      return res.json({ url: imgData.url });
+    } else if (imgData.b64_json) {
+      return res.json({ url: `data:image/png;base64,${imgData.b64_json}` });
+    } else {
+      return res.status(500).json({ error: 'Nema url ni b64_json u odgovoru: ' + JSON.stringify(imgData).substring(0, 200) });
+    }
 
   } catch (err) {
     console.error('Error:', err.message);
@@ -78,5 +89,5 @@ app.post('/generate', async (req, res) => {
 
 const PORT = process.env.PORT || 3000;
 const server = app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-server.timeout = 300000; // 5 minuta
+server.timeout = 300000;
 server.keepAliveTimeout = 300000;
