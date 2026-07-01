@@ -59,17 +59,45 @@ async function processJob(jobId, model, gender, age, season) {
       zima: 'cozy warm nursery, soft lamp light, winter atmosphere'
     }[season] || 'cozy Scandinavian nursery with soft natural light';
 
+    // Boje po spolu
+    const colors = {
+      djevojčica: { cloud: 'plain solid white OR plain solid light lilac', sleepy: 'plain solid mint green OR plain solid white OR plain solid light lilac' },
+      dječak:     { cloud: 'plain solid white OR plain solid light blue',  sleepy: 'plain solid mint green OR plain solid light blue OR plain solid white' }
+    };
+    const colorKey = gender === 'djevojčica' ? 'djevojčica' : 'dječak';
+    const color = isNewborn ? colors[colorKey].cloud : colors[colorKey].sleepy;
+
+    // Opisi oblika po modelu
+    const shapes = {
+      cloud:    'closed cocoon sleep sack with NO legs — bottom is completely sealed like a bag, baby legs inside together. Double zipper down center front. Sleeveless with wide armholes. Soft crinkled muslin fabric.',
+      proljece: 'sleep sack with TWO SEPARATE LEG TUBES like pants. Zipper down center front from chest to crotch. Sleeveless, arms completely free. Legs end at ankle with OPEN FEET — bare feet visible. Light double-layer muslin.',
+      ljeto:    'sleep sack with TWO SEPARATE LEG TUBES like pants. Zipper down center front. Sleeveless. Legs end at ankle with OPEN FEET — bare feet visible. Ultra-thin single-layer muslin, very lightweight.',
+      jesen:    'sleep sack with TWO SEPARATE LEG TUBES like pants. Zipper down center front. Sleeveless. Legs end with CLOSED FEET — integrated foot covers like built-in socks. Medium weight jersey with fleece lining.',
+      zima:     'sleep sack with TWO SEPARATE LEG TUBES like pants. Zipper down center front. Sleeveless. Legs end with CLOSED FEET — integrated foot covers like built-in socks. Thick padded quilted fabric, very warm.'
+    };
+    const shape = shapes[model] || shapes.proljece;
+
+    // Uzorak po modelu — stvarni Mamino uzorci
+    const patterns = {
+      cloud:    'completely plain solid color fabric, no prints or patterns',
+      proljece: 'completely plain solid color fabric, no prints or patterns',
+      ljeto:    'completely plain solid color fabric, no prints or patterns',
+      jesen:    'white fabric with small brown teddy bear print pattern OR plain white OR plain beige with small star pattern',
+      zima:     'white fabric with small brown teddy bear print pattern OR plain white OR plain beige with small star pattern'
+    };
+    const pattern = patterns[model] || 'plain solid color';
+
     let prompt;
     if (isNewborn) {
-      prompt = `Realistic professional lifestyle photo of a peaceful sleeping newborn baby (${genderWord}) lying in a white wooden baby crib in a ${roomMood}.
-The baby is dressed in the EXACT sleep sack shown in the reference image — same color, same pattern, same shape, same zipper, same fabric texture. Reproduce the garment faithfully.
-Small woven "mamino" label sewn on the side seam at the bottom of the sleep sack.
-Baby sleeping peacefully, full body visible in crib with white wooden rails. Soft natural light. Warm lifestyle photography, shallow depth of field. No other text or logos.`;
+      prompt = `Realistic professional lifestyle photo of a peaceful sleeping newborn baby (${genderWord}) in a white wooden baby crib in a ${roomMood}.
+The baby is wearing a baby sleep sack. Color: ${color}. Pattern: ${pattern}. Shape: ${shape}.
+Small woven label with text "mamino" sewn on the side seam at the bottom of the sleep sack.
+Baby sleeping peacefully, full body visible in crib with white wooden rails. Soft natural light from window. Warm lifestyle photography, shallow depth of field. No other text or logos visible.`;
     } else {
       prompt = `Realistic professional lifestyle photo of a happy smiling ${genderWord} toddler, age ${age}, standing upright in a ${roomMood}.
-The child is dressed in the EXACT sleep sack with legs shown in the reference image — same color, same pattern (reproduce exactly), same shape, same zipper, same leg shape, same feet (open or closed). Reproduce the garment faithfully.
-Small woven "mamino" label sewn on the outer side seam of the left leg near the ankle.
-Child standing smiling, full body visible head to toe, arms slightly out. Warm lifestyle photography, natural light, shallow depth of field. No other text or logos.`;
+The child is wearing a toddler sleep sack. Color: ${color}. Pattern: ${pattern}. Shape: ${shape}.
+Small woven label with text "mamino" sewn on the outer side seam of the left leg near the ankle.
+Child standing smiling, full body visible head to toe, arms slightly out. Warm lifestyle photography, natural light, shallow depth of field. No other text or logos visible.`;
     }
 
 
