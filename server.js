@@ -72,38 +72,27 @@ Small woven "mamino" label sewn on the outer side seam of the left leg near the 
 Child standing smiling, full body visible head to toe, arms slightly out. Warm lifestyle photography, natural light, shallow depth of field. No other text or logos.`;
     }
 
-    // Pošalji na OpenAI /v1/images/edits s referentnom slikom
-    console.log(`[${jobId}] Sending to OpenAI...`);
-    const form = new FormData();
-    form.append('model', 'gpt-image-2');
-    form.append('prompt', prompt);
-    form.append('n', '1');
-    form.append('size', '1024x1024');
-    form.append('quality', 'medium');
 
-    const ext = mime.includes('png') ? 'png' : 'jpg';
-    form.append('image[]', buffer, {
-      filename: `product.${ext}`,
-      contentType: mime
-    });
-
-    const formHeaders = form.getHeaders();
-    const formBuffer = await new Promise((resolve, reject) => {
-      const chunks = [];
-      form.on('data', chunk => chunks.push(chunk));
-      form.on('end', () => resolve(Buffer.concat(chunks)));
-      form.on('error', reject);
+    // Koristi /v1/images/generations s detaljnim promptom (edits ima problem s multipart)
+    console.log(`[${jobId}] Sending to OpenAI generations...`);
+    
+    const bodyStr = JSON.stringify({
+      model: 'gpt-image-2',
+      prompt: prompt,
+      n: 1,
+      size: '1024x1024',
+      quality: 'medium'
     });
 
     const result = await new Promise((resolve, reject) => {
       const options = {
         hostname: 'api.openai.com',
-        path: '/v1/images/edits',
+        path: '/v1/images/generations',
         method: 'POST',
         headers: {
-          ...formHeaders,
+          'Content-Type': 'application/json',
           'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
-          'Content-Length': formBuffer.length
+          'Content-Length': Buffer.byteLength(bodyStr)
         },
         timeout: 300000
       };
@@ -111,12 +100,9 @@ Child standing smiling, full body visible head to toe, arms slightly out. Warm l
       const apiReq = https.request(options, (apiRes) => {
         let data = '';
         console.log(`[${jobId}] OpenAI HTTP status: ${apiRes.statusCode}`);
-        apiRes.on('data', chunk => {
-          data += chunk;
-          console.log(`[${jobId}] Receiving data chunk, total: ${data.length} bytes`);
-        });
+        apiRes.on('data', chunk => { data += chunk; });
         apiRes.on('end', () => {
-          console.log(`[${jobId}] Full response received: ${data.substring(0, 500)}`);
+          console.log(`[${jobId}] Response: ${data.substring(0, 400)}`);
           try {
             resolve({ status: apiRes.statusCode, body: JSON.parse(data) });
           } catch (e) {
@@ -125,17 +111,17 @@ Child standing smiling, full body visible head to toe, arms slightly out. Warm l
         });
       });
       apiReq.on('error', (err) => {
-        console.error(`[${jobId}] Request error: ${err.message}`);
+        console.error(`[${jobId}] Error: ${err.message}`);
         reject(err);
       });
       apiReq.on('timeout', () => {
-        console.error(`[${jobId}] Request timeout!`);
+        console.error(`[${jobId}] Timeout!`);
         apiReq.destroy();
         reject(new Error('OpenAI timeout'));
       });
-      apiReq.write(formBuffer);
+      apiReq.write(bodyStr);
       apiReq.end();
-      console.log(`[${jobId}] Request sent, waiting for response...`);
+      console.log(`[${jobId}] Request sent...`);
     });
 
     console.log(`[${jobId}] OpenAI status: ${result.status}`);
