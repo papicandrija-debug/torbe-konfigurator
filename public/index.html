@@ -678,12 +678,12 @@ async function generate() {
 
   // Gender-based colors — only real Mamino colors, NO animal prints or invented patterns
   const cloudColors = {
-    'djevojčica': 'solid plain white muslin OR solid plain lilac (light purple) muslin OR solid plain beige muslin — completely plain, NO prints, NO animal motifs, NO stars, NO dots, NO decorations on the fabric',
-    'dječak': 'solid plain blue muslin OR solid plain mint (light green) muslin OR solid plain white muslin — completely plain, NO prints, NO animal motifs, NO stars, NO dots, NO decorations on the fabric'
+    'djevojčica': 'SOLID COLOR ONLY — choose one: plain white OR plain light lilac OR plain beige. The fabric must be 100% one solid color with zero prints, zero embroidery, zero patterns. Imagine a plain white bedsheet — that is the texture. NO clouds, NO stars, NO animals, NO hearts, NO dots, NO stripes, NO decorations of any kind.',
+    'dječak': 'SOLID COLOR ONLY — choose one: plain light blue OR plain mint green OR plain white. The fabric must be 100% one solid color with zero prints, zero embroidery, zero patterns. Imagine a plain white bedsheet — that is the texture. NO clouds, NO stars, NO animals, NO hearts, NO dots, NO stripes, NO decorations of any kind.'
   };
   const sleepyColors = {
-    'djevojčica': 'solid plain white muslin OR solid plain lilac (light purple) muslin OR solid plain mint muslin OR solid plain beige — completely plain solid color fabric, absolutely NO animal prints, NO bear motifs, NO stars, NO polka dots, NO patterns whatsoever',
-    'dječak': 'solid plain blue muslin OR solid plain mint (light green) muslin OR solid plain white OR solid plain beige — completely plain solid color fabric, absolutely NO animal prints, NO bear motifs, NO stars, NO polka dots, NO patterns whatsoever'
+    'djevojčica': 'SOLID COLOR ONLY — choose one: plain white OR plain light lilac OR plain mint green OR plain beige. The fabric is 100% one flat solid color. CRITICAL: absolutely zero prints, zero patterns, zero motifs of any kind — no clouds, no stars, no animals, no hearts, no dots, no stripes. Just a single flat solid color like a plain t-shirt.',
+    'dječak': 'SOLID COLOR ONLY — choose one: plain light blue OR plain mint green OR plain white OR plain beige. The fabric is 100% one flat solid color. CRITICAL: absolutely zero prints, zero patterns, zero motifs of any kind — no clouds, no stars, no animals, no hearts, no dots, no stripes. Just a single flat solid color like a plain t-shirt.'
   };
 
   const colorCloud = cloudColors[gender];
@@ -714,14 +714,22 @@ The sleep sack must be clearly visible and well-lit as the main focus.`;
       zima: 'thick padded jersey fabric with quilted look, warm and puffy'
     }[selectedModel] || 'soft muslin fabric';
 
+    const feetDesc = {
+      proljece: 'open feet — legs end at the ankle, bare feet visible below',
+      ljeto: 'open feet — legs end at the ankle, bare feet visible below',
+      jesen: 'closed feet — integrated foot covers built into the fabric like socks, no bare feet visible',
+      zima: 'closed feet — integrated foot covers built into the fabric like socks, no bare feet visible'
+    }[selectedModel] || 'open feet';
+
     prompt = `Realistic lifestyle photo of a happy ${genderHr} toddler/child, age ${age}, standing upright in a ${roomMood}.
-The child is wearing a wearable blanket sleep sack with separate legs (like a wearable sleeping bag with leg holes). 
-The sleep sack color: ${colorSleepy}.
+The child is wearing a wearable sleep sack with separate legs.
+Color: ${colorSleepy}.
 Fabric: ${fabricDesc}.
-Shape: sleep sack with two separate leg openings at the bottom, zipper down the front, sleeveless (no arms covered), fits snugly on the torso.
-The child stands smiling, full body visible, arms slightly out.
-NO text, NO logos, NO labels visible on the sleep sack. Plain solid color only.
-Professional lifestyle photography, warm tones, natural light.`;
+Shape: sleep sack with two separate leg tubes, zipper down the front, sleeveless (arms free), snug on torso. Feet: ${feetDesc}.
+The child stands smiling, full body visible from head to toe, arms slightly out.
+CRITICAL: fabric must be plain solid color — NO prints, NO patterns, NO motifs, NO embroidery, NO clouds, NO stars, NO animals, NO decorations of any kind on the fabric.
+NO text, NO logos, NO labels visible anywhere.
+Professional lifestyle photography, warm tones, natural light, shallow depth of field.`;
   }
 
   try {
