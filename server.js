@@ -110,8 +110,13 @@ Child standing smiling, full body visible head to toe, arms slightly out. Warm l
 
       const apiReq = https.request(options, (apiRes) => {
         let data = '';
-        apiRes.on('data', chunk => data += chunk);
+        console.log(`[${jobId}] OpenAI HTTP status: ${apiRes.statusCode}`);
+        apiRes.on('data', chunk => {
+          data += chunk;
+          console.log(`[${jobId}] Receiving data chunk, total: ${data.length} bytes`);
+        });
         apiRes.on('end', () => {
+          console.log(`[${jobId}] Full response received: ${data.substring(0, 500)}`);
           try {
             resolve({ status: apiRes.statusCode, body: JSON.parse(data) });
           } catch (e) {
@@ -119,10 +124,18 @@ Child standing smiling, full body visible head to toe, arms slightly out. Warm l
           }
         });
       });
-      apiReq.on('error', reject);
-      apiReq.on('timeout', () => { apiReq.destroy(); reject(new Error('OpenAI timeout')); });
+      apiReq.on('error', (err) => {
+        console.error(`[${jobId}] Request error: ${err.message}`);
+        reject(err);
+      });
+      apiReq.on('timeout', () => {
+        console.error(`[${jobId}] Request timeout!`);
+        apiReq.destroy();
+        reject(new Error('OpenAI timeout'));
+      });
       apiReq.write(formBuffer);
       apiReq.end();
+      console.log(`[${jobId}] Request sent, waiting for response...`);
     });
 
     console.log(`[${jobId}] OpenAI status: ${result.status}`);
