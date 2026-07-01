@@ -1,5 +1,5 @@
 {
-  "name": "torbe-konfigurator",
+  "name": "mamino-konfigurator",
   "version": "1.0.0",
   "main": "server.js",
   "scripts": {
@@ -7,6 +7,7 @@
   },
   "dependencies": {
     "express": "^4.18.2",
-    "node-fetch": "^2.7.0"
+    "node-fetch": "^2.6.9",
+    "form-data": "^4.0.0"
   }
 }
