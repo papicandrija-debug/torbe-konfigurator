@@ -733,10 +733,17 @@ Professional lifestyle photography, warm tones, natural light, shallow depth of 
   }
 
   try {
+    const season = document.getElementById('season').value;
     const res = await fetch('/generate', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ prompt })
+      body: JSON.stringify({ 
+        prompt,
+        model: selectedModel,
+        gender,
+        age,
+        season
+      })
     });
     const data = await res.json();
     stopTimer();
