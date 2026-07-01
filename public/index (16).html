@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="hr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mamino – Konfigurator Vreća za Spavanje</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --navy: #1E2D5A;
+    --brown: #9C7B6B;
+    --lavender: #C4A8D4;
+    --cream: #FAF7F4;
+    --soft-green: #A8C4B4;
+    --warm-white: #FDFCFB;
+    --text: #2C2C2C;
+    --muted: #888;
+    --border: #E8E2DC;
+  }
+
+  body {
+    font-family: 'Jost', sans-serif;
+    background: var(--cream);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  header {
+    background: var(--navy);
+    padding: 16px 40px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  header img { height: 36px; }
+  header .divider { width: 1px; height: 28px; background: rgba(255,255,255,0.2); }
+  header span {
+    color: rgba(255,255,255,0.75);
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18px;
+    font-style: italic;
+    letter-spacing: 0.5px;
+  }
+
+  /* MAIN LAYOUT */
+  .app {
+    display: grid;
+    grid-template-columns: 280px 340px 1fr;
+    min-height: calc(100vh - 68px);
+  }
+
+  /* PANELS */
+  .panel {
+    padding: 32px 24px;
+    border-right: 1px solid var(--border);
+    background: var(--warm-white);
+  }
+  .panel:last-child { border-right: none; background: var(--cream); }
+
+  .panel-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: var(--navy);
+    margin-bottom: 28px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  /* FORM ELEMENTS */
+  .field { margin-bottom: 22px; }
+  .field label {
+    display: block;
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 8px;
+    font-weight: 500;
+  }
+
+  .gender-toggle {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .gender-btn {
+    padding: 10px;
+    border: 1.5px solid var(--border);
+    background: white;
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: 'Jost', sans-serif;
+    font-size: 13px;
+    color: var(--text);
+    transition: all 0.2s;
+    text-align: center;
+  }
+  .gender-btn:hover { border-color: var(--lavender); }
+  .gender-btn.active {
+    background: var(--navy);
+    border-color: var(--navy);
+    color: white;
+  }
+
+  .styled-select {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: 6px;
+    background: white;
+    font-family: 'Jost', sans-serif;
+    font-size: 13px;
+    color: var(--text);
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23888' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    cursor: pointer;
+  }
+  .styled-select:focus { outline: none; border-color: var(--navy); }
+
+  /* SEASON HINT */
+  .season-hint {
+    background: linear-gradient(135deg, #f0f4ff 0%, #f8f4ff 100%);
+    border: 1px solid var(--lavender);
+    border-radius: 8px;
+    padding: 14px;
+    font-size: 12px;
+    color: var(--navy);
+    line-height: 1.6;
+    margin-bottom: 20px;
+  }
+  .season-hint strong { display: block; margin-bottom: 4px; font-weight: 500; }
+
+  /* MODEL CARDS */
+  .model-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .model-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: white;
+    position: relative;
+  }
+  .model-card:hover { border-color: var(--lavender); transform: translateX(2px); }
+  .model-card.selected {
+    border-color: var(--navy);
+    background: #f0f3fa;
+  }
+  .model-card img {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 6px;
+    flex-shrink: 0;
+  }
+  .model-info { flex: 1; min-width: 0; }
+  .model-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--navy);
+    margin-bottom: 2px;
+  }
+  .model-sub {
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.5px;
+  }
+  .model-tag {
+    font-size: 10px;
+    padding: 3px 7px;
+    border-radius: 20px;
+    font-weight: 500;
+    letter-spacing: 0.3px;
+    flex-shrink: 0;
+  }
+  .tag-spring { background: #e8f5e9; color: #388e3c; }
+  .tag-summer { background: #fff9e6; color: #f59800; }
+  .tag-autumn { background: #fff3e0; color: #e65100; }
+  .tag-winter { background: #e8eaf6; color: #3949ab; }
+  .tag-newborn { background: #fce4ec; color: #c2185b; }
+
+  .model-card .check {
+    position: absolute;
+    top: 8px; right: 8px;
+    width: 18px; height: 18px;
+    background: var(--navy);
+    border-radius: 50%;
+    display: none;
+    align-items: center;
+    justify-content: center;
+  }
+  .model-card.selected .check { display: flex; }
+  .check svg { width: 10px; height: 10px; }
+
+  /* GENERATE BUTTON */
+  .generate-btn {
+    width: 100%;
+    padding: 14px;
+    background: var(--navy);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-family: 'Jost', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    cursor: pointer;
+    margin-top: 24px;
+    transition: all 0.2s;
+  }
+  .generate-btn:hover { background: #2a3d7a; transform: translateY(-1px); }
+  .generate-btn:disabled { background: #ccc; cursor: not-allowed; transform: none; }
+
+  /* RESULT PANEL */
+  .result-panel {
+    padding: 32px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .result-placeholder {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: var(--muted);
+    gap: 16px;
+  }
+  .result-placeholder svg { opacity: 0.25; }
+  .result-placeholder p {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 20px;
+    font-style: italic;
+    color: var(--navy);
+    opacity: 0.4;
+  }
+  .result-placeholder small { font-size: 12px; }
+
+  /* LOADING */
+  .loading-state {
+    flex: 1;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+  }
+  .loading-state.active { display: flex; }
+  .spinner {
+    width: 48px; height: 48px;
+    border: 3px solid var(--border);
+    border-top-color: var(--navy);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .timer-text {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px;
+    color: var(--navy);
+    font-style: italic;
+  }
+  .loading-msg {
+    font-size: 12px;
+    color: var(--muted);
+    letter-spacing: 0.5px;
+  }
+
+  /* RESULT IMAGE */
+  .result-image-wrap {
+    flex: 1;
+    display: none;
+    flex-direction: column;
+    gap: 20px;
+  }
+  .result-image-wrap.active { display: flex; }
+  .result-image-wrap img {
+    width: 100%;
+    max-height: 520px;
+    object-fit: contain;
+    border-radius: 12px;
+    box-shadow: 0 8px 40px rgba(30,45,90,0.12);
+    background: white;
+  }
+
+  /* FIT BADGE */
+  .fit-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+  }
+  .fit-badge.ok { background: #e8f5e9; color: #2e7d32; }
+  .fit-badge.warn { background: #fff8e1; color: #f57f17; }
+
+  .result-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+  }
+  .result-model-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--navy);
+  }
+
+  .shop-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 18px;
+    background: var(--brown);
+    color: white;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    transition: background 0.2s;
+  }
+  .shop-link:hover { background: #7a5f51; }
+
+  .regen-btn {
+    padding: 10px 18px;
+    border: 1.5px solid var(--navy);
+    background: transparent;
+    color: var(--navy);
+    border-radius: 6px;
+    font-family: 'Jost', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .regen-btn:hover { background: var(--navy); color: white; }
+
+  /* ERROR */
+  .error-msg {
+    display: none;
+    background: #fdecea;
+    border: 1px solid #f5c6cb;
+    border-radius: 8px;
+    padding: 14px 16px;
+    font-size: 13px;
+    color: #c0392b;
+    margin-top: 12px;
+  }
+  .error-msg.active { display: block; }
+
+  /* RECOMMENDED TAG */
+  .rec-badge {
+    font-size: 10px;
+    background: var(--lavender);
+    color: var(--navy);
+    padding: 2px 7px;
+    border-radius: 20px;
+    font-weight: 500;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <img src="https://mamino.hr/cdn/shop/files/Mamino_logo_WHITE.png?v=1740941600" alt="Mamino">
+  <div class="divider"></div>
+  <span>Konfigurator vreća za spavanje</span>
+</header>
+
+<div class="app">
+
+  <!-- COLUMN 1: Dijete -->
+  <div class="panel">
+    <div class="panel-title">Podaci o djetetu</div>
+
+    <div class="field">
+      <label>Spol</label>
+      <div class="gender-toggle">
+        <button class="gender-btn active" onclick="setGender('djevojčica', this)">👧 Djevojčica</button>
+        <button class="gender-btn" onclick="setGender('dječak', this)">👦 Dječak</button>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Dob djeteta</label>
+      <select class="styled-select" id="age" onchange="onAgeChange()">
+        <option value="0-3mj">0 – 3 mjeseca</option>
+        <option value="3-6mj">3 – 6 mjeseci</option>
+        <option value="6-12mj">6 – 12 mjeseci</option>
+        <option value="1-2god">1 – 2 godine</option>
+        <option value="2-3god">2 – 3 godine</option>
+        <option value="3-4god">3 – 4 godine</option>
+        <option value="4-5god">4 – 5 godina</option>
+        <option value="5-6god">5 – 6 godina</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label>Godišnje doba / temperatura sobe</label>
+      <select class="styled-select" id="season" onchange="onSeasonChange()">
+        <option value="proljeće">🌸 Proljeće (18–22°C)</option>
+        <option value="ljeto">☀️ Ljeto (22°C+)</option>
+        <option value="jesen">🍂 Jesen (16–20°C)</option>
+        <option value="zima">❄️ Zima (ispod 18°C)</option>
+      </select>
+    </div>
+
+    <div class="season-hint" id="seasonHint">
+      <strong>💡 Preporuka odijevanja</strong>
+      <span id="seasonHintText">Body dugih rukava + pidžama</span>
+    </div>
+  </div>
+
+  <!-- COLUMN 2: Odabir modela -->
+  <div class="panel">
+    <div class="panel-title">Odaberi model</div>
+    <div class="model-grid" id="modelGrid">
+
+      <div class="model-card" id="card-cloud" onclick="selectModel('cloud')">
+        <img src="https://mamino.hr/cdn/shop/files/Vreca_za_spavanje_novorodjence.png?v=1768914766" alt="Cloud">
+        <div class="model-info">
+          <div class="model-name">Cloud™</div>
+          <div class="model-sub">Novorođenče · 0–6 mj.</div>
+        </div>
+        <span class="model-tag tag-newborn">Novorođenče</span>
+        <div class="check"><svg viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      </div>
+
+      <div class="model-card" id="card-proljece" onclick="selectModel('proljece')">
+        <img src="https://mamino.hr/cdn/shop/files/6.jpg?v=1748352986&width=200" alt="Sleepy Proljeće">
+        <div class="model-info">
+          <div class="model-name">Sleepy™ Proljeće</div>
+          <div class="model-sub">6 mj. – 6 god. · 18–22°C</div>
+        </div>
+        <span class="model-tag tag-spring">Proljeće</span>
+        <div class="check"><svg viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      </div>
+
+      <div class="model-card" id="card-ljeto" onclick="selectModel('ljeto')">
+        <img src="https://mamino.hr/cdn/shop/files/MAMINO_2-49.jpg?v=1748352986&width=200" alt="Sleepy Ljeto">
+        <div class="model-info">
+          <div class="model-name">Sleepy™ Ljeto</div>
+          <div class="model-sub">6 mj. – 6 god. · 22°C+</div>
+        </div>
+        <span class="model-tag tag-summer">Ljeto</span>
+        <div class="check"><svg viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      </div>
+
+      <div class="model-card" id="card-jesen" onclick="selectModel('jesen')">
+        <img src="https://mamino.hr/cdn/shop/files/mamino_jesen_2025-30.jpg?v=1758780056&width=200" alt="Sleepy Jesen">
+        <div class="model-info">
+          <div class="model-name">Sleepy™ Jesen</div>
+          <div class="model-sub">6 mj. – 6 god. · 16–20°C</div>
+        </div>
+        <span class="model-tag tag-autumn">Jesen</span>
+        <div class="check"><svg viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      </div>
+
+      <div class="model-card" id="card-zima" onclick="selectModel('zima')">
+        <img src="https://mamino.hr/cdn/shop/files/MAMINO_2-53.jpg?v=1768914766&width=200" alt="Sleepy Zima">
+        <div class="model-info">
+          <div class="model-name">Sleepy™ Zima</div>
+          <div class="model-sub">6 mj. – 6 god. · ispod 18°C</div>
+        </div>
+        <span class="model-tag tag-winter">Zima</span>
+        <div class="check"><svg viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      </div>
+
+    </div>
+
+    <button class="generate-btn" id="genBtn" onclick="generate()" disabled>
+      ✦ Generiraj prikaz
+    </button>
+    <div class="error-msg" id="errorMsg"></div>
+  </div>
+
+  <!-- COLUMN 3: Rezultat -->
+  <div class="result-panel">
+    <div class="panel-title">AI prikaz</div>
+
+    <div class="result-placeholder" id="placeholder">
+      <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
+        <rect x="8" y="16" width="48" height="36" rx="6" stroke="#1E2D5A" stroke-width="2"/>
+        <circle cx="32" cy="34" r="10" stroke="#1E2D5A" stroke-width="2"/>
+        <circle cx="32" cy="34" r="4" fill="#1E2D5A" opacity="0.3"/>
+        <circle cx="46" cy="22" r="3" fill="#1E2D5A" opacity="0.5"/>
+      </svg>
+      <p>Odaberi model i generiraj sliku</p>
+      <small>AI će prikazati vaše dijete u odabranoj vreći za spavanje</small>
+    </div>
+
+    <div class="loading-state" id="loadingState">
+      <div class="spinner"></div>
+      <div class="timer-text" id="timerText">0s</div>
+      <div class="loading-msg">AI generira sliku vreće za spavanje…</div>
+    </div>
+
+    <div class="result-image-wrap" id="resultWrap">
+      <img id="resultImg" src="" alt="AI prikaz">
+      <div class="result-meta">
+        <div>
+          <div class="result-model-name" id="resultModelName"></div>
+          <div id="fitBadge" style="margin-top:8px;"></div>
+        </div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-left:auto;">
+          <button class="regen-btn" onclick="generate()">↻ Ponovi</button>
+          <a class="shop-link" id="shopLink" href="#" target="_blank">Kupi →</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ── State ──────────────────────────────────────────────
+let gender = 'djevojčica';
+let selectedModel = null;
+let timerInterval = null;
+
+const modelData = {
+  cloud: {
+    name: 'Cloud™ Vreća za Spavanje',
+    shopUrl: 'https://mamino.hr/products/zatvorena-vreca-za-spavanje',
+    ageOk: ['0-3mj','3-6mj'],
+    description: 'Zatvorena vreća za novorođenčad, muslin, dvostruki patent. Pruža osjećaj sigurnosti nalik povijanju.',
+    scene: 'newborn',
+    color: 'bijelo muslin s nježnim uzorkom',
+    shape: 'zatvorena vreća bez nogavica, oblika kakao, s patentom naprijed'
+  },
+  proljece: {
+    name: 'Sleepy™ Proljeće',
+    shopUrl: 'https://mamino.hr/products/sleepy-proljece',
+    ageOk: ['6-12mj','1-2god','2-3god','3-4god','4-5god','5-6god'],
+    description: 'Dva sloja mekog muslina, s nogavicama. Idealna za 18–22°C.',
+    scene: 'child',
+    color: 'bijela ili bež muslin, nježan pastelni uzorak',
+    shape: 'vreća s nogavicama, muslin tkanina, patent sprijeda, lagana i prozračna'
+  },
+  ljeto: {
+    name: 'Sleepy™ Ljeto',
+    shopUrl: 'https://mamino.hr/products/sleepy-ljeto',
+    ageOk: ['6-12mj','1-2god','2-3god','3-4god','4-5god','5-6god'],
+    description: 'Jedan sloj muslina, iznimno lagana. Za najtoplije dane 22°C+.',
+    scene: 'child',
+    color: 'lagana bijela ili mint muslin tkanina',
+    shape: 'vreća s nogavicama, jedan sloj muslina, patent sprijeda, posebno tanka i lagana'
+  },
+  jesen: {
+    name: 'Sleepy™ Jesen',
+    shopUrl: 'https://mamino.hr/products/sleepy-jesen',
+    ageOk: ['6-12mj','1-2god','2-3god','3-4god','4-5god','5-6god'],
+    description: 'Pamučni pliš iznutra, jersey izvana. Za prijelazno razdoblje 16–20°C.',
+    scene: 'child',
+    color: 'topla bež ili medo uzorak, jersey materijal s plišanim unutarnjim slojem',
+    shape: 'vreća s nogavicama, deblji materijal, patent sprijeda, topla i mekana na dodir'
+  },
+  zima: {
+    name: 'Sleepy™ Zima',
+    shopUrl: 'https://mamino.hr/products/sleepy-zima',
+    ageOk: ['6-12mj','1-2god','2-3god','3-4god','4-5god','5-6god'],
+    description: 'Tri sloja s antialergijskim punjenjem. Maksimalna toplina do 18°C.',
+    scene: 'child',
+    color: 'topla bež ili medo uzorak, debeli jersey materijal s punjenjem',
+    shape: 'vreća s nogavicama i odvojivim rukavima, debeli troslojni materijal, patent sprijeda'
+  }
+};
+
+const seasonHints = {
+  'proljeće': 'Body dugih rukava + pidžama',
+  'ljeto': 'Body s kratkim rukavima ili samo pelena',
+  'jesen': 'Body dugih rukava + pidžama',
+  'zima': 'Body dugih rukava + pidžama (deblji)'
+};
+
+const shopLinks = {
+  cloud: 'https://mamino.hr/products/zatvorena-vreca-za-spavanje',
+  proljece: 'https://mamino.hr/products/sleepy-proljece',
+  ljeto: 'https://mamino.hr/products/sleepy-ljeto',
+  jesen: 'https://mamino.hr/products/sleepy-jesen',
+  zima: 'https://mamino.hr/products/sleepy-zima'
+};
+
+// ── UI Helpers ─────────────────────────────────────────
+function setGender(g, btn) {
+  gender = g;
+  document.querySelectorAll('.gender-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+function onAgeChange() { updateRecommendations(); }
+function onSeasonChange() {
+  const season = document.getElementById('season').value;
+  document.getElementById('seasonHintText').textContent = seasonHints[season] || '';
+  updateRecommendations();
+}
+
+function updateRecommendations() {
+  const age = document.getElementById('age').value;
+  const season = document.getElementById('season').value;
+  // Highlight recommended
+  document.querySelectorAll('.model-card').forEach(c => {
+    c.querySelector('.model-info .model-sub').style.fontWeight = '';
+  });
+  // Auto-select logic for Cloud if newborn age
+  const isNewborn = ['0-3mj','3-6mj'].includes(age);
+  document.getElementById('card-cloud').style.opacity = isNewborn ? '1' : '0.7';
+  ['proljece','ljeto','jesen','zima'].forEach(m => {
+    document.getElementById('card-' + m).style.opacity = isNewborn ? '0.7' : '1';
+  });
+}
+
+function selectModel(model) {
+  selectedModel = model;
+  document.querySelectorAll('.model-card').forEach(c => c.classList.remove('selected'));
+  document.getElementById('card-' + model).classList.add('selected');
+  document.getElementById('genBtn').disabled = false;
+  document.getElementById('errorMsg').classList.remove('active');
+}
+
+// ── Timer ───────────────────────────────────────────────
+function startTimer() {
+  let s = 0;
+  timerInterval = setInterval(() => {
+    s++;
+    document.getElementById('timerText').textContent = s + 's';
+  }, 1000);
+}
+function stopTimer() {
+  clearInterval(timerInterval);
+}
+
+// ── Generate ────────────────────────────────────────────
+async function generate() {
+  if (!selectedModel) return;
+
+  const age = document.getElementById('age').options[document.getElementById('age').selectedIndex].text;
+  const m = modelData[selectedModel];
+
+  // Show loading
+  document.getElementById('placeholder').style.display = 'none';
+  document.getElementById('resultWrap').classList.remove('active');
+  document.getElementById('loadingState').classList.add('active');
+  document.getElementById('timerText').textContent = '0s';
+  document.getElementById('errorMsg').classList.remove('active');
+  document.getElementById('genBtn').disabled = true;
+  startTimer();
+
+  // Build prompt
+  const genderHr = gender === 'djevojčica' ? 'girl' : 'boy';
+  const isNewborn = m.scene === 'newborn';
+
+  let prompt;
+  if (isNewborn) {
+    prompt = `Realistic lifestyle photo of a peaceful newborn baby sleeping in a white wooden baby crib.
+The baby is wearing a soft Mamino Cloud™ baby sleep sack: ${m.color}, ${m.shape}.
+Gender: ${genderHr}. Age: ${age}.
+The crib has white wooden rails, a light cotton fitted sheet. Soft natural light from a nearby window.
+Cozy, minimal Scandinavian-style nursery room. Warm, soft tones. Professional photography, shallow depth of field.
+The sleep sack is clearly visible and well-lit. Photo style: warm lifestyle baby photography.`;
+  } else {
+    const season = document.getElementById('season').value;
+    const roomMood = {
+      'proljeće': 'bright airy room with soft morning light, spring flowers on the windowsill',
+      'ljeto': 'bright sunny nursery room, light curtains, cheerful atmosphere',
+      'jesen': 'cozy warm nursery room, warm evening light, autumn colors in decor',
+      'zima': 'cozy warm nursery room, soft lamp light, winter atmosphere, maybe snow outside the window'
+    }[season] || 'cozy nursery room';
+
+    prompt = `Realistic lifestyle photo of a happy ${genderHr} child, age ${age}, standing in a ${roomMood}.
+The child is wearing a Mamino Sleepy™ baby/toddler sleep sack with legs: ${m.color}, ${m.shape}.
+The child is standing and smiling, arms slightly out to the sides, full body visible.
+The sleep sack with legs is clearly visible — this is the main product.
+Professional lifestyle photography, warm tones, natural light. Clean background.
+Photo style: warm, soft, family lifestyle photography.`;
+  }
+
+  try {
+    const res = await fetch('/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prompt })
+    });
+    const data = await res.json();
+    stopTimer();
+
+    if (data.error) throw new Error(data.error);
+
+    const imgSrc = data.url || (data.b64 ? 'data:image/png;base64,' + data.b64 : null);
+    if (!imgSrc) throw new Error('Nema slike u odgovoru');
+
+    // Show result
+    document.getElementById('loadingState').classList.remove('active');
+    document.getElementById('resultWrap').classList.add('active');
+    document.getElementById('resultImg').src = imgSrc;
+    document.getElementById('resultModelName').textContent = m.name;
+    document.getElementById('shopLink').href = shopLinks[selectedModel];
+
+    // Fit check
+    const currentAge = document.getElementById('age').value;
+    const isOk = m.ageOk.includes(currentAge);
+    const fitEl = document.getElementById('fitBadge');
+    if (isOk) {
+      fitEl.innerHTML = '<span class="fit-badge ok">✓ Odgovara dobi djeteta</span>';
+    } else {
+      const rec = m.scene === 'newborn'
+        ? 'Cloud™ je namijenjen za 0–6 mjeseci'
+        : 'Sleepy™ modeli su za djecu od 6 mj. do 6 god.';
+      fitEl.innerHTML = `<span class="fit-badge warn">⚠ ${rec}</span>`;
+    }
+
+  } catch (err) {
+    stopTimer();
+    document.getElementById('loadingState').classList.remove('active');
+    document.getElementById('placeholder').style.display = 'flex';
+    document.getElementById('errorMsg').textContent = 'Greška: ' + err.message;
+    document.getElementById('errorMsg').classList.add('active');
+  }
+
+  document.getElementById('genBtn').disabled = false;
+}
+
+// Init
+onSeasonChange();
+updateRecommendations();
+</script>
+</body>
+</html>
