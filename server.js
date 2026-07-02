@@ -25,11 +25,11 @@ function fetchImageBuffer(imageUrl) {
 }
 
 const modelImages = {
-  cloud:    'https://mamino.hr/cdn/shop/files/Vreca_za_spavanje_novorodjence.png?v=1768914766',
-  proljece: 'https://mamino.hr/cdn/shop/files/Mamino_white_product_photos_2_1.jpg?v=1754995072',
-  ljeto:    'https://mamino.hr/cdn/shop/files/MAMINO_2-49.jpg?v=1748352986',
-  jesen:    'https://mamino.hr/cdn/shop/files/mamino_jesen_2025-30.jpg?v=1758780056',
-  zima:     'https://mamino.hr/cdn/shop/files/MAMINO_2-53.jpg?v=1768914766'
+  cloud:    'https://mamino.hr/cdn/shop/files/2_8b7961e8-ef5a-4e58-8823-f17f3a28ff2b.jpg?v=1768914766&width=1024',
+  proljece: 'https://mamino.hr/cdn/shop/files/6.jpg?v=1748352986&width=1024',
+  ljeto:    'https://mamino.hr/cdn/shop/files/14.jpg?v=1748352955&width=1024',
+  jesen:    'https://mamino.hr/cdn/shop/files/9B8C5CAF-A2C3-49BF-A04A-B7A49C10D7D8.jpg?v=1758779919&width=1024',
+  zima:     'https://mamino.hr/cdn/shop/files/357738E7-FD50-448A-9F3F-81982C0FD639.jpg?v=1758779968&width=1024'
 };
 
 function buildPrompt(model, gender, age, season) {
