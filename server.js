@@ -79,6 +79,94 @@ Child standing smiling, full body visible head to toe, arms slightly out. Warm l
   }
 }
 
+// Korak 1: gpt-4o gleda sliku proizvoda i opisuje je
+function describeProduct(imageBase64, imageMime, model, gender, age, season) {
+  return new Promise((resolve, reject) => {
+    const isNewborn = model === 'cloud';
+    const genderWord = gender === 'djevojčica' ? 'girl' : 'boy';
+
+    const roomMood = {
+      proljeće: 'bright airy Scandinavian nursery, soft natural morning light, white wooden furniture',
+      ljeto: 'bright sunny nursery room, light linen curtains, warm daylight',
+      jesen: 'cozy warm nursery, warm lamp light, wooden accents',
+      zima: 'cozy warm nursery, soft lamp light, winter atmosphere'
+    }[season] || 'cozy Scandinavian nursery with soft natural light';
+
+    const sceneDesc = isNewborn
+      ? `a peaceful sleeping newborn ${genderWord} baby lying in a white wooden baby crib in a ${roomMood}`
+      : `a happy smiling ${genderWord} toddler, age ${age}, standing upright in a ${roomMood}`;
+
+    const labelDesc = isNewborn
+      ? `small woven "mamino" label sewn on the side seam at the bottom of the sleep sack`
+      : `small woven "mamino" label sewn on the outer side seam of the left leg near the ankle`;
+
+    const bodyStr = JSON.stringify({
+      model: 'gpt-4o',
+      max_tokens: 1000,
+      messages: [{
+        role: 'user',
+        content: [
+          {
+            type: 'image_url',
+            image_url: {
+              url: `data:${imageMime};base64,${imageBase64}`,
+              detail: 'high'
+            }
+          },
+          {
+            type: 'text',
+            text: `You are a professional product photographer's assistant. Look carefully at this baby sleep sack product image.
+
+Write a detailed image generation prompt that shows: ${sceneDesc}, wearing THIS EXACT sleep sack — reproduce the exact color, exact pattern/print (if any), exact shape, exact zipper placement, exact leg style, exact feet (open or closed).
+
+Also include: ${labelDesc}.
+
+Rules:
+- Describe the garment exactly as you see it — color, pattern, shape, everything
+- Full body of child visible
+- Warm professional lifestyle photography style
+- No other brand logos or text visible except the small mamino label
+- Write ONLY the image generation prompt, nothing else`
+          }
+        ]
+      }]
+    });
+
+    const options = {
+      hostname: 'api.openai.com',
+      path: '/v1/chat/completions',
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+        'Content-Length': Buffer.byteLength(bodyStr)
+      }
+    };
+
+    const req = https.request(options, (res) => {
+      let data = '';
+      res.on('data', chunk => { data += chunk; });
+      res.on('end', () => {
+        try {
+          const parsed = JSON.parse(data);
+          if (parsed.error) return reject(new Error(parsed.error.message));
+          const prompt = parsed.choices?.[0]?.message?.content;
+          if (!prompt) return reject(new Error('No prompt from gpt-4o: ' + data.substring(0, 200)));
+          console.log('GPT-4o prompt:', prompt.substring(0, 200));
+          resolve(prompt);
+        } catch (e) {
+          reject(new Error('Parse error: ' + data.substring(0, 200)));
+        }
+      });
+    });
+
+    req.on('error', reject);
+    req.write(bodyStr);
+    req.end();
+  });
+}
+
+// Korak 2: gpt-image-2 generira sliku
 function callOpenAI(prompt) {
   return new Promise((resolve, reject) => {
     const bodyStr = JSON.stringify({
@@ -102,10 +190,10 @@ function callOpenAI(prompt) {
 
     const req = https.request(options, (res) => {
       let data = '';
-      console.log('OpenAI status:', res.statusCode);
+      console.log('OpenAI image status:', res.statusCode);
       res.on('data', chunk => { data += chunk; });
       res.on('end', () => {
-        console.log('OpenAI response:', data.substring(0, 300));
+        console.log('OpenAI image response:', data.substring(0, 300));
         try {
           resolve({ status: res.statusCode, body: JSON.parse(data) });
         } catch (e) {
@@ -143,12 +231,16 @@ app.get('/generate-stream', async (req, res) => {
   try {
     send('status', { message: 'Dohvaćam sliku proizvoda...' });
     console.log('Fetching product image:', model);
-    await fetchImageBuffer(modelImages[model]);
-    console.log('Product image fetched');
+    const { buffer, mime } = await fetchImageBuffer(modelImages[model]);
+    const imageBase64 = buffer.toString('base64');
+    console.log('Product image fetched:', buffer.length, 'bytes');
+
+    send('status', { message: 'AI analizira proizvod...' });
+    console.log('Asking gpt-4o to describe product...');
+    const prompt = await describeProduct(imageBase64, mime, model, gender, age, season);
 
     send('status', { message: 'AI generira sliku...' });
-    const prompt = buildPrompt(model, gender, age, season);
-    console.log('Calling OpenAI...');
+    console.log('Calling gpt-image-2...');
 
     const result = await callOpenAI(prompt);
 
