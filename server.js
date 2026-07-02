@@ -4,7 +4,6 @@ const http = require('http');
 
 const app = express();
 app.use(express.json());
-app.use(express.static('public'));
 
 // Preuzmi sliku s URL-a kao Buffer
 function fetchImageBuffer(imageUrl) {
@@ -175,6 +174,9 @@ app.get('/generate-stream', async (req, res) => {
   }
 });
 
+// Static files NAKON API routeva da ne blokiraju /generate-stream
+app.use(express.static('public'));
+
 const PORT = process.env.PORT || 3000;
 const server = app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-server.timeout = 0; // bez timeoutra na serveru
+server.timeout = 0;
